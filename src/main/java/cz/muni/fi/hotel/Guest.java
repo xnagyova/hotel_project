@@ -8,7 +8,7 @@ import static java.lang.Long.compare;
 /**
  * Created by User on 8.3.2017.
  */
-public class Guest implements Comparable<Guest> {
+public class Guest  {
 
     private long id;
     private String name;
@@ -68,9 +68,10 @@ public class Guest implements Comparable<Guest> {
     }
 
 
-
+/*
     @Override
     public int compareTo(Guest o) {
         return compare(this.id,o.getId());
     }
+    */
 }

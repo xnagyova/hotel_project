@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.lang.*;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -17,8 +18,14 @@ import javax.persistence.EntityNotFoundException;
 import static org.junit.Assert.*;
 
 
+/**
+ * Created by User on 8.3.2017.
+ */
+
 public class GuestManagerImplTest {
 
+   /* private static final Comparator<Guest> GUEST_ID_COMPARATOR =
+            (g1, g2) -> g1.getId().compareTo(g2.getId());*/
     private GuestManagerImpl guestManager;
     private CharSequence correctNumber = "+0123456789";
 
@@ -229,8 +236,8 @@ public class GuestManagerImplTest {
         List<Guest> expected = Arrays.asList(g1,g2);
         List<Guest> actual = guestManager.findAllGuests();
 
-        //actual.sort(GUEST_ID_COMPARATOR);
-        //expected.sort(GUEST_ID_COMPARATOR);
+        /*actual.sort(GUEST_ID_COMPARATOR);
+        expected.sort(GUEST_ID_COMPARATOR);*/
 
         assertEquals(expected,actual);
         assertDeepEquals(expected,actual);
@@ -279,7 +286,6 @@ public class GuestManagerImplTest {
         return guest;
     }
 
-    //private static final Comparator<Guest> GUEST_ID_COMPARATOR = (g1, g2) -> g1.getId().compareTo(g2.getId());
 
 
 }
