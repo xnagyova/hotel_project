@@ -1,4 +1,4 @@
-package cz.muni.fi;
+package cz.muni.fi.hotel;
 
 /**
  * Created by User on 8.3.2017.
@@ -43,5 +43,20 @@ public class Room {
 
     public void setBalcony(boolean balcony) {
         this.balcony = balcony;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Room room = (Room) o;
+
+        return id == room.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
     }
 }

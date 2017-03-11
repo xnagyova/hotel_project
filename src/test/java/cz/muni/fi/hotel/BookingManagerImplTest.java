@@ -1,3 +1,5 @@
+package cz.muni.fi.hotel;
+
 import static org.junit.Assert.*;
 
 /**

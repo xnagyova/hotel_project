@@ -1,15 +1,18 @@
-package cz.muni.fi;
+package cz.muni.fi.hotel;
 
+import java.time.LocalDate;
 import java.util.Date;
+
+import static java.lang.Long.compare;
 
 /**
  * Created by User on 8.3.2017.
  */
-public class Guest {
+public class Guest implements Comparable<Guest> {
 
     private long id;
     private String name;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     private String phoneNumber;
 
     public Guest() {
@@ -23,6 +26,23 @@ public class Guest {
         this.id = id;
     }
 
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Guest guest = (Guest) o;
+
+        return id == guest.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
+
     public String getName() {
         return name;
     }
@@ -31,11 +51,11 @@ public class Guest {
         this.name = name;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -45,5 +65,12 @@ public class Guest {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+
+
+    @Override
+    public int compareTo(Guest o) {
+        return compare(this.id,o.getId());
     }
 }

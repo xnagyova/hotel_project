@@ -1,6 +1,7 @@
-package cz.muni.fi;
+package cz.muni.fi.hotel;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by User on 8.3.2017.
@@ -18,7 +19,7 @@ public class GuestManagerImpl implements GuestManager {
 
     }
 
-    public Collection<Guest> findAllGuests() {
+    public List<Guest> findAllGuests() {
         return null;
     }
 
@@ -26,7 +27,7 @@ public class GuestManagerImpl implements GuestManager {
         return null;
     }
 
-    public Collection<Guest> findGuestByName(String name) {
+    public List<Guest> findGuestByName(String name) {
         return null;
     }
 }

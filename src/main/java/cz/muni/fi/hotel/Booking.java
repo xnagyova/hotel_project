@@ -1,4 +1,4 @@
-package cz.muni.fi;
+package cz.muni.fi.hotel;
 
 import java.util.Date;
 

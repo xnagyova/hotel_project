@@ -1,7 +1,8 @@
-package cz.muni.fi;
+package cz.muni.fi.hotel;
 
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by User on 8.3.2017.
@@ -14,10 +15,10 @@ public interface GuestManager {
 
     public void updateGuestInformation(Guest guest);
 
-    public Collection <Guest> findAllGuests();
+    public List<Guest> findAllGuests();
 
     public Guest findGuestById(long id);
 
-    public Collection<Guest> findGuestByName(String name);
+    public List<Guest> findGuestByName(String name);
 
 }
