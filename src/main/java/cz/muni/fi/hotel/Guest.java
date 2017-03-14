@@ -10,7 +10,7 @@ import static java.lang.Long.compare;
  */
 public class Guest  {
 
-    private long id;
+    private Long id;
     private String name;
     private LocalDate dateOfBirth;
     private String phoneNumber;
@@ -18,11 +18,11 @@ public class Guest  {
     public Guest() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

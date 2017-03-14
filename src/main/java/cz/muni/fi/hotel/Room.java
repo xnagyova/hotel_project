@@ -5,7 +5,7 @@ package cz.muni.fi.hotel;
  */
 public class Room {
 
-    private long id;
+    private Long id;
     private int floorNumber;
     private int capacity;
     private boolean balcony;
@@ -13,11 +13,11 @@ public class Room {
     public Room() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Created by ${KristianKatanik} on 11.03.2017.
+ * @author kkatanik & snagyova
  */
 public class RoomManagerImplTest {
 
@@ -46,7 +46,7 @@ public class RoomManagerImplTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void createNullRoom() {
+    public void buildNullRoom() {
         roomManager.buildRoom(null);
     }
 
@@ -61,12 +61,19 @@ public class RoomManagerImplTest {
 
 
     @Test
-    public void buildRoomWithNegativeFloor() {
+    public void buildRoomOnNegativeFloor() {
         Room room = newRoom(-1,5,true);
         expectedException.expect(IllegalArgumentException.class);
         roomManager.buildRoom(room);
     }
 
+    @Test
+    public void buildRoomOnZeroFloor() {
+        Room room = newRoom(0,5,true);
+        roomManager.buildRoom(room);
+        Room result = roomManager.findRoomById(room.getId());
+        assertNotNull(result);
+    }
 
     @Test
     public void buildRoomWithNegativeCapacity() {
@@ -89,7 +96,7 @@ public class RoomManagerImplTest {
     @Test
     public void updateRoomInformation() throws Exception {
         Room room = newRoom(5,5,true);
-        Room anotherRoom = newRoom(4,4,false);
+        Room anotherRoom = newRoom(4,4,true);
         roomManager.buildRoom(room);
         roomManager.buildRoom(anotherRoom);
         Long roomId = room.getId();
@@ -131,7 +138,7 @@ public class RoomManagerImplTest {
     public void updateRoomWithNullId() {
         Room room = newRoom(5,5,true);
         roomManager.buildRoom(room);
-        room.setId(Long.parseLong(null));
+        room.setId(null);
         expectedException.expect(IllegalArgumentException.class);
         roomManager.updateRoomInformation(room);
     }
@@ -148,7 +155,7 @@ public class RoomManagerImplTest {
 
 
     @Test
-    public void updateRoomWithNegativeFloor() {
+    public void updateRoomOnNegativeFloor() {
         Room room = newRoom(5,5,true);
         roomManager.buildRoom(room);
         room.setFloorNumber(-1);
@@ -201,7 +208,7 @@ public class RoomManagerImplTest {
     @Test
     public void deleteRoomWithNullId() {
         Room room = newRoom(5,5,true);
-        room.setId(Long.parseLong(null));
+        room.setId(null);
         expectedException.expect(IllegalArgumentException.class);
         roomManager.deleteRoom(room);
     }
@@ -239,8 +246,9 @@ public class RoomManagerImplTest {
         List<Room> expected = Arrays.asList(r1,r2);
         List<Room> actual = roomManager.listAllRooms();
 
-        /*actual.sort(ROOM_ID_COMPARATOR);
-        expected.sort(ROOM_ID_COMPARATOR);*/
+        actual.sort(ROOM_ID_COMPARATOR);
+        expected.sort(ROOM_ID_COMPARATOR);
+
 
         assertEquals(expected, actual);
         assertDeepEquals(expected, actual);
@@ -272,7 +280,7 @@ public class RoomManagerImplTest {
         assertEquals(expected.isBalcony(), actual.isBalcony());
     }
 
-    /*private static final Comparator<Room> ROOM_ID_COMPARATOR =
-            (r1, r2) -> r1.getId().compareTo(r2.getId());*/
+    private static final Comparator<Room> ROOM_ID_COMPARATOR =
+            (r1, r2) -> r1.getId().compareTo(r2.getId());
 
 }
