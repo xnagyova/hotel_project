@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fc3dca1f-f126-4f36-9264-ca6b96e8ea9c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/EntityNotFoundException.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/EntityNotFoundException.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/EntityNotFoundException.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Guest.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Guest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Room.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Room.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestManagerImplTest.java" afterPath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestManagerImplTest.java" />
@@ -792,12 +792,12 @@
       <workItem from="1489251546348" duration="2977000" />
       <workItem from="1489256988273" duration="2938000" />
       <workItem from="1489482471654" duration="889000" />
-      <workItem from="1489503733004" duration="7971000" />
+      <workItem from="1489503733004" duration="8229000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="32374000" />
+    <option name="totallyTimeSpent" value="32632000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
