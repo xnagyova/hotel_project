@@ -81,6 +81,13 @@ public class GuestManagerImplTest {
     }
 
     @Test
+    public void createGuestWithWrongName() {
+        Guest guest = newGuest("Peter2 123", LocalDate.of(1970,11,11), "+42199977788");
+        expectedException.expect(IllegalArgumentException.class);
+        guestManager.createGuest(guest);
+    }
+
+    @Test
     public void createGuestWithNullPhoneNumber() {
         Guest guest = newGuest("Jozef Celer",LocalDate.of(1970,11,11),null);
         guestManager.createGuest(guest);
@@ -91,7 +98,21 @@ public class GuestManagerImplTest {
 
     @Test
     public void createGuestWithWrongPhoneNumber() {
-        Guest guest = newGuest("Jozef Celer", LocalDate.of(1970,11,11),"+123a871654");
+        Guest guest = newGuest("Jozef Celer", LocalDate.of(1970,11,11),"+12a871654");
+        expectedException.expect(IllegalArgumentException.class);
+        guestManager.createGuest(guest);
+    }
+
+    @Test
+    public void createGuestWithTooLongPhoneNumber() {
+        Guest guest = newGuest("Jozef Celer", LocalDate.of(1970,11,11),"+12348716542262");
+        expectedException.expect(IllegalArgumentException.class);
+        guestManager.createGuest(guest);
+    }
+
+    @Test
+    public void createGuestWithTooShortPhoneNumber() {
+        Guest guest = newGuest("Jozef Celer", LocalDate.of(1970,11,11),"+12348716");
         expectedException.expect(IllegalArgumentException.class);
         guestManager.createGuest(guest);
     }
@@ -109,6 +130,7 @@ public class GuestManagerImplTest {
         expectedException.expect(IllegalArgumentException.class);
         guestManager.createGuest(guest);
     }
+
 
 
 
@@ -220,6 +242,67 @@ public class GuestManagerImplTest {
         expectedException.expect(EntityNotFoundException.class);
         guestManager.updateGuestInformation(guest);
     }
+
+    @Test
+    public void updateGuestWithWrongPhoneNumber() {
+        Guest guest = newGuest("Michal Pekný",LocalDate.of(15,5,1988),"+420777125551");
+        guestManager.createGuest(guest);
+        guest.setPhoneNumber("+420a12456789");
+        expectedException.expect(IllegalArgumentException.class);
+        guestManager.updateGuestInformation(guest);
+    }
+
+    @Test
+    public void updateGuestWithTooLongPhoneNumber() {
+        Guest guest = newGuest("Michal Pekný",LocalDate.of(15,5,1988),"+420777125551");
+        guestManager.createGuest(guest);
+        guest.setPhoneNumber("+42033312456789");
+        expectedException.expect(IllegalArgumentException.class);
+        guestManager.updateGuestInformation(guest);
+    }
+
+    @Test
+    public void updateGuestWithTooShortPhoneNumber() {
+        Guest guest = newGuest("Michal Pekný",LocalDate.of(15,5,1988),"+420777125551");
+        guestManager.createGuest(guest);
+        guest.setPhoneNumber("+4203331245");
+        expectedException.expect(IllegalArgumentException.class);
+        guestManager.updateGuestInformation(guest);
+    }
+
+    @Test
+    public void updateGuestWithNullPhoneNumber() {
+        Guest guest = newGuest("Michal Pekný",LocalDate.of(15,5,1988),"+420777125551");
+        guestManager.createGuest(guest);
+        guest.setPhoneNumber(null);
+        Guest result = guestManager.findGuestById(guest.getId());
+        guestManager.updateGuestInformation(guest);
+        assertNotNull(result);
+        assertNotNull(result.getName());
+    }
+
+    @Test
+    public void updateGuestWithWrongName() {
+        Guest guest = newGuest("Michal Pekný",LocalDate.of(15,5,1988),"+420777125551");
+        guestManager.createGuest(guest);
+        guest.setName("Michal2 124");
+        expectedException.expect(IllegalArgumentException.class);
+        guestManager.updateGuestInformation(guest);
+    }
+
+    @Test
+    public void updateGuestWithNullName() {
+        Guest guest = newGuest("Michal Pekný",LocalDate.of(15,5,1988),"+420777125551");
+        guestManager.createGuest(guest);
+        guest.setName(null);
+        Guest result = guestManager.findGuestById(guest.getId());
+        guestManager.updateGuestInformation(guest);
+        assertNotNull(result);
+        assertNotNull(result.getPhoneNumber());
+    }
+
+
+
 
 
 
