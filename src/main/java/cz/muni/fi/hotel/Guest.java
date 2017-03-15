@@ -27,22 +27,6 @@ public class Guest  {
     }
 
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Guest guest = (Guest) o;
-
-        return id == guest.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (id ^ (id >>> 32));
-    }
-
     public String getName() {
         return name;
     }
@@ -68,10 +52,29 @@ public class Guest  {
     }
 
 
-/*
     @Override
-    public int compareTo(Guest o) {
-        return compare(this.id,o.getId());
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Guest guest = (Guest) o;
+
+        return id == guest.id;
     }
-    */
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
+
+
+    @Override
+    public String toString() {
+        return "Guest{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                '}';
+    }
 }

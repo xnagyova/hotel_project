@@ -59,4 +59,14 @@ public class Room {
     public int hashCode() {
         return (int) (id ^ (id >>> 32));
     }
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "id=" + id +
+                ", floorNumber=" + floorNumber +
+                ", capacity=" + capacity +
+                ", balcony=" + balcony +
+                '}';
+    }
 }

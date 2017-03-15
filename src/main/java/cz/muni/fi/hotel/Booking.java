@@ -54,4 +54,39 @@ public class Booking {
     public void setDepartureDate(Date departureDate) {
         this.departureDate = departureDate;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Booking booking = (Booking) o;
+
+        if (price != booking.price) return false;
+        if (room != null ? !room.equals(booking.room) : booking.room != null) return false;
+        if (guest != null ? !guest.equals(booking.guest) : booking.guest != null) return false;
+        if (arrivalDate != null ? !arrivalDate.equals(booking.arrivalDate) : booking.arrivalDate != null) return false;
+        return departureDate != null ? departureDate.equals(booking.departureDate) : booking.departureDate == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = price;
+        result = 31 * result + (room != null ? room.hashCode() : 0);
+        result = 31 * result + (guest != null ? guest.hashCode() : 0);
+        result = 31 * result + (arrivalDate != null ? arrivalDate.hashCode() : 0);
+        result = 31 * result + (departureDate != null ? departureDate.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "price=" + price +
+                ", room=" + room +
+                ", guest=" + guest +
+                ", arrivalDate=" + arrivalDate +
+                ", departureDate=" + departureDate +
+                '}';
+    }
 }

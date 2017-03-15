@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.rules.ExpectedException;
+import static org.assertj.core.api.Assertions.*;
 
-import javax.persistence.EntityNotFoundException;
 import javax.xml.bind.ValidationException;
 
 import static org.junit.Assert.*;
@@ -27,7 +27,7 @@ public class GuestManagerImplTest {
 
 
     private GuestManagerImpl guestManager;
-    private final static ZonedDateTime NOW = LocalDateTime.of(2016, 2,25,14,5).atZone(ZoneId.of("UTC"));
+    private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
 
     @Before
     public void setUp() throws SQLException {
@@ -40,18 +40,35 @@ public class GuestManagerImplTest {
     // attribute annotated with @Rule annotation must be public :-(
     public ExpectedException expectedException = ExpectedException.none();
 
+    private GuestBuilder sampleJohnGuestBuilder() {
+        return new GuestBuilder()
+                .name("John Fox")
+                .dateOfBirth(1984,Month.FEBRUARY,5)
+                .phoneNumber("+421947865586");
+
+    }
+
+
+    private GuestBuilder sampleSamanthaGuestBuilder() {
+        return new GuestBuilder()
+                .name("Samantha Fox")
+                .dateOfBirth(1974,Month.AUGUST,10)
+                .phoneNumber("+421947842396");
+
+    }
+
 
     @Test
     public void createGuest() {
-        Guest guest = newGuest("John Legend", LocalDate.of(1998, 12, 31), "64536456464");
+        Guest guest = sampleJohnGuestBuilder().build();
         guestManager.createGuest(guest);
 
         Long guestId = guest.getId();
-        assertNotNull(guestId);
-        Guest result = guestManager.findGuestById(guestId);
-        assertEquals(guest, result);
-        assertNotSame(guest, result);
-        assertDeepEquals(guest, result);
+        assertThat(guestId).isNotNull();
+
+        assertThat(guestManager.findGuestById(guestId))
+                .isNotSameAs(guest)
+                .isEqualToComparingFieldByField(guest);
 
     }
 
@@ -64,7 +81,7 @@ public class GuestManagerImplTest {
     @Test
     public void createGuestBornTomorrow() {
 
-        LocalDate tomorrow = NOW.toLocalDate().plusDays(1);
+        LocalDate tomorrow = TODAY.toLocalDate().plusDays(1);
         Guest guest = newGuest("John Legend", tomorrow, "+421974889962");
 
         guestManager.createGuest(guest);
@@ -76,8 +93,8 @@ public class GuestManagerImplTest {
     @Test
     public void createGuestBornToday() {
 
-        LocalDate today = NOW.toLocalDate();
-        Guest guest = newGuest("John Legend", today, "+421974889962");
+
+        Guest guest = newGuest("John Legend", TODAY.toLocalDate(), "+421974889962");
 
         guestManager.createGuest(guest);
 
@@ -101,11 +118,11 @@ public class GuestManagerImplTest {
 
     @Test
     public void createGuestWithNullName() {
-        Guest guest = newGuest(null, LocalDate.of(1970, 11, 11), "+42199977788");
-        guestManager.createGuest(guest);
-        Guest result = guestManager.findGuestById(guest.getId());
-        assertNotNull(result);
-        assertNotNull(result.getName());
+        Guest guest = sampleJohnGuestBuilder()
+                .name(null)
+                .build();
+        assertThatThrownBy(() -> guestManager.createGuest(guest))
+                .isInstanceOf(ValidationException.class);
     }
 
 
@@ -139,12 +156,7 @@ public class GuestManagerImplTest {
         guestManager.createGuest(guest);
     }
 
-    @Test
-    public void createGuestWithWrongName() {
-        Guest guest = newGuest("Peter2 123", LocalDate.of(1970,11,11), "+42199977788");
-        expectedException.expect(IllegalArgumentException.class);
-        guestManager.createGuest(guest);
-    }
+
 
     @Test
     public void createGuestWithNullPhoneNumber() {
@@ -186,25 +198,6 @@ public class GuestManagerImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void deleteNullGuest() {
         guestManager.deleteGuest(null);
-    }
-
-
-    @Test
-    public void deleteGuestWithNullId() {
-        Guest guest = newGuest("Michal Bob",LocalDate.of(1970,11,11),"+420777888999");
-        guest.setId(null);
-        expectedException.expect(IllegalArgumentException.class);
-        guestManager.deleteGuest(guest);
-    }
-
-
-    @Test
-    public void deleteGuestWithNonExistingId() {
-        Guest guest = newGuest("Michal Bob",LocalDate.of(1977,11,11),"+420777888999");
-        guest.setId(1L);
-        expectedException.expect(EntityNotFoundException.class);
-        guestManager.deleteGuest(guest);
-
     }
 
 
@@ -252,25 +245,7 @@ public class GuestManagerImplTest {
         guestManager.updateGuestInformation(null);
     }
 
-    @Test
-    public void updateGuestWithNullId() {
-        Guest guest = newGuest( "Michal Novák", LocalDate.of(1980,11,13), "+420999888777");
-        guestManager.createGuest(guest);
-        guest.setId(null);
-        expectedException.expect(IllegalArgumentException.class);
-        guestManager.updateGuestInformation(guest);
 
-    }
-
-
-    @Test
-    public void updateGuestWithNonExistingId() {
-        Guest guest = newGuest("Michal Pekný",LocalDate.of(1998,5,15),"+420777125551");
-        guestManager.createGuest(guest);
-        guest.setId(guest.getId() + 1);
-        expectedException.expect(EntityNotFoundException.class);
-        guestManager.updateGuestInformation(guest);
-    }
 
     @Test
     public void updateGuestWithWrongPhoneNumber() {
@@ -302,18 +277,10 @@ public class GuestManagerImplTest {
         guestManager.updateGuestInformation(guest);
     }
 
-    @Test
-    public void updateGuestWithWrongName() {
-        Guest guest = newGuest("Michal Pekný",LocalDate.of(1998,5,15),"+420777125551");
-        guestManager.createGuest(guest);
-        guest.setName("Michal2 124");
-        expectedException.expect(IllegalArgumentException.class);
-        guestManager.updateGuestInformation(guest);
-    }
 
     @Test
     public void updateGuestWithTomorrowDateOfBirth() {
-        LocalDate tomorrow = NOW.toLocalDate().plusDays(1);
+        LocalDate tomorrow = TODAY.toLocalDate().plusDays(1);
         Guest guest = newGuest("Michal Pekný",LocalDate.of(1998,5,15),"+420777125551");
         guestManager.createGuest(guest);
         guest.setDateOfBirth(tomorrow);
@@ -369,22 +336,18 @@ public class GuestManagerImplTest {
 
     @Test
     public void findAllGuests(){
-        assertTrue(guestManager.findAllGuests().isEmpty());
 
-        Guest g1 = newGuest("Pavol Rychlý",LocalDate.of(1977,11,11),"+42193555777");
-        Guest g2 = newGuest("Petra Bystrá",LocalDate.of(1978,11,11),"+420777888999");
+        assertThat(guestManager.findAllGuests()).isEmpty();
 
-        guestManager.createGuest(g1);
-        guestManager.createGuest(g2);
+        Guest john = sampleJohnGuestBuilder().build();
+        Guest samantha = sampleSamanthaGuestBuilder().build();
 
-        List<Guest> expected = Arrays.asList(g1,g2);
-        List<Guest> actual = guestManager.findAllGuests();
+        guestManager.createGuest(john);
+        guestManager.createGuest(samantha);
 
-        actual.sort(GUEST_ID_COMPARATOR);
-        expected.sort(GUEST_ID_COMPARATOR);
-
-        assertEquals(expected,actual);
-        assertDeepEquals(expected,actual);
+        assertThat(guestManager.findAllGuests())
+                .usingFieldByFieldElementComparator()
+                .containsOnly(john,samantha);
     }
 
 
