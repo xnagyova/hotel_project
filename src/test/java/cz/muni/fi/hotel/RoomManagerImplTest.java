@@ -5,12 +5,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import javax.xml.bind.ValidationException;
 
-import static org.junit.Assert.*;
+
 import static org.assertj.core.api.Assertions.*;
 
 /**
@@ -31,18 +28,35 @@ public class RoomManagerImplTest {
     // attribute annotated with @Rule annotation must be public :-(
     public ExpectedException expectedException = ExpectedException.none();
 
+    private RoomBuilder sampleBigRoomBuilder() {
+        return new RoomBuilder()
+                .floorNumber(3)
+                .capacity(6)
+                .balcony(true);
+
+    }
+
+
+    private RoomBuilder sampleSmallRoomBuilder() {
+        return new RoomBuilder()
+                .floorNumber(1)
+                .capacity(3)
+                .balcony(false);
+
+    }
+
     @Test
     public void buildRoom(){
 
-        Room room = newRoom(5,5,true);
+        Room room = sampleBigRoomBuilder().build();
         roomManager.buildRoom(room);
 
         Long roomId = room.getId();
-        assertNotNull(roomId);
-        Room result = roomManager.findRoomById(roomId);
-        assertEquals(room,result);
-        assertNotSame(room,result);
-        assertDeepEquals(room,result);
+        assertThat(roomId).isNotNull();
+
+        assertThat(roomManager.findRoomById(roomId))
+                .isNotSameAs(room)
+                .isEqualToComparingFieldByField(room);
 
     }
 
@@ -52,81 +66,73 @@ public class RoomManagerImplTest {
     }
 
 
-    @Test
-    public void buildRoomWithExistingId() {
-        Room room = newRoom(5,5,true);
-        room.setId(1L);
-        expectedException.expect(IllegalArgumentException.class);
-        roomManager.buildRoom(room);
-    }
-
 
     @Test
     public void buildRoomOnNegativeFloor() {
-        Room room = newRoom(-1,5,true);
-        expectedException.expect(IllegalArgumentException.class);
-        roomManager.buildRoom(room);
+        Room room = sampleBigRoomBuilder().floorNumber(-1).build();
+        assertThatThrownBy(() -> roomManager.buildRoom(room))
+                .isInstanceOf(ValidationException.class);
     }
 
     @Test
     public void buildRoomOnZeroFloor() {
-        Room room = newRoom(0,5,true);
+        Room room = sampleBigRoomBuilder().floorNumber(0).build();
         roomManager.buildRoom(room);
-        Room result = roomManager.findRoomById(room.getId());
-        assertNotNull(result);
+        assertThat(roomManager.findRoomById(room.getId()))
+                .isNotNull()
+                .isEqualToComparingFieldByField(room);
     }
 
     @Test
     public void buildRoomWithNegativeCapacity() {
-        Room room = newRoom(5,-1,true);
-        expectedException.expect(IllegalArgumentException.class);
-        roomManager.buildRoom(room);
+        Room room = sampleBigRoomBuilder().capacity(-1).build();
+        assertThatThrownBy(() -> roomManager.buildRoom(room))
+                .isInstanceOf(ValidationException.class);
     }
 
 
 
     @Test
     public void buildRoomWithZeroCapacity() {
-        Room room = newRoom(5,0,true);
-        expectedException.expect(IllegalArgumentException.class);
+        Room room = sampleBigRoomBuilder().capacity(0).build();
+        expectedException.expect(ValidationException.class);
         roomManager.buildRoom(room);
     }
 
+    @FunctionalInterface
+    private static interface Operation<T> {
+        void callOn(T subjectOfOperation);
+    }
 
+    private void testUpdateRoomInformation(Operation<Room> updateOperation) {
+        Room sourceRoom = sampleBigRoomBuilder().build();
+        Room anotherRoom = sampleSmallRoomBuilder().build();
+        roomManager.buildRoom(sourceRoom);
+        roomManager.buildRoom(anotherRoom);
+
+        updateOperation.callOn(sourceRoom);
+
+        roomManager.updateRoomInformation(sourceRoom);
+        assertThat(roomManager.findRoomById(sourceRoom.getId()))
+                .isEqualToComparingFieldByField(sourceRoom);
+
+        assertThat(roomManager.findRoomById(anotherRoom.getId()))
+                .isEqualToComparingFieldByField(anotherRoom);
+    }
 
     @Test
-    public void updateRoomInformation() throws Exception {
-        Room room = newRoom(5,5,true);
-        Room anotherRoom = newRoom(4,4,true);
-        roomManager.buildRoom(room);
-        roomManager.buildRoom(anotherRoom);
-        Long roomId = room.getId();
+    public void updateRoomFloorNumber() {
+        testUpdateRoomInformation((room) -> room.setFloorNumber(4));
+    }
 
-        room = roomManager.findRoomById(roomId);
-        room.setFloorNumber(0);
-        roomManager.updateRoomInformation(room);
-        assertEquals(0,room.getFloorNumber());
-        assertEquals(5,room.getCapacity());
-        assertEquals(true,room.isBalcony());
+    @Test
+    public void updateRoomCapacity() {
+        testUpdateRoomInformation((room) -> room.setCapacity(4));
+    }
 
-        room = roomManager.findRoomById(roomId);
-        room.setCapacity(1);
-        roomManager.updateRoomInformation(room);
-        assertEquals(0,room.getFloorNumber());
-        assertEquals(1,room.getCapacity());
-        assertEquals(true,room.isBalcony());
-
-        room = roomManager.findRoomById(roomId);
-        room.setBalcony(false);
-        roomManager.updateRoomInformation(room);
-        assertEquals(0,room.getFloorNumber());
-        assertEquals(1,room.getCapacity());
-        assertEquals(false,room.isBalcony());
-
-
-        // Check if updates didn't affected other records
-        assertDeepEquals(anotherRoom, roomManager.findRoomById(anotherRoom.getId()));
-
+    @Test
+    public void updateRoomBalcony() {
+        testUpdateRoomInformation((room) -> room.setBalcony(false));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -135,69 +141,50 @@ public class RoomManagerImplTest {
     }
 
 
-    @Test
-    public void updateRoomWithNullId() {
-        Room room = newRoom(5,5,true);
-        roomManager.buildRoom(room);
-        room.setId(null);
-        expectedException.expect(IllegalArgumentException.class);
-        roomManager.updateRoomInformation(room);
-    }
-
-
-    @Test
-    public void updateRoomWithNonExistingId() {
-        Room room = newRoom(5,5,true);
-        roomManager.buildRoom(room);
-        room.setId(room.getId() + 1);
-        expectedException.expect(EntityNotFoundException.class);
-        roomManager.updateRoomInformation(room);
-    }
-
 
     @Test
     public void updateRoomOnNegativeFloor() {
-        Room room = newRoom(5,5,true);
+        Room room = sampleBigRoomBuilder().build();
         roomManager.buildRoom(room);
         room.setFloorNumber(-1);
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ValidationException.class);
         roomManager.updateRoomInformation(room);
     }
 
 
     @Test
     public void updateRoomWithZeroCapacity() {
-        Room room = newRoom(5,5,true);
+        Room room = sampleBigRoomBuilder().build();
         roomManager.buildRoom(room);
         room.setCapacity(0);
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ValidationException.class);
         roomManager.updateRoomInformation(room);
     }
 
 
     @Test
     public void updateRoomWithNegativeCapacity() {
-        Room room = newRoom(5,5,true);
+        Room room = sampleBigRoomBuilder().build();
         roomManager.buildRoom(room);
         room.setCapacity(-1);
-        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expect(ValidationException.class);
         roomManager.updateRoomInformation(room);
     }
 
     @Test
     public void deleteRoom()  {
-        Room r1 = newRoom(5,5,true);
-        Room r2 = newRoom(4,4,false);
+        Room r1 = sampleBigRoomBuilder().build();
+        Room r2 = sampleSmallRoomBuilder().build();
         roomManager.buildRoom(r1);
         roomManager.buildRoom(r2);
 
-        assertNotNull(roomManager.findRoomById(r1.getId()));
-        assertNotNull(roomManager.findRoomById(r2.getId()));
+        assertThat(roomManager.findRoomById(r1.getId())).isNotNull();
+        assertThat(roomManager.findRoomById(r2.getId())).isNotNull();
 
         roomManager.deleteRoom(r1);
 
-        assertNotNull(roomManager.findRoomById(r2.getId()));
-        assertNull(roomManager.findRoomById(r1.getId()));
+        assertThat(roomManager.findRoomById(r1.getId())).isNull();
+        assertThat(roomManager.findRoomById(r2.getId())).isNotNull();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -206,82 +193,53 @@ public class RoomManagerImplTest {
     }
 
 
+
     @Test
-    public void deleteRoomWithNullId() {
-        Room room = newRoom(5,5,true);
-        room.setId(null);
-        expectedException.expect(IllegalArgumentException.class);
-        roomManager.deleteRoom(room);
+    public void findFreeRoom() {
+        assertThat(roomManager.findFreeRoom()).isEmpty();
+
+        Room fullRoom1 = sampleBigRoomBuilder().capacity(0).build();
+        Room fullRoom2 = sampleSmallRoomBuilder().capacity(0).build();
+        Room notFullRoom1 = sampleBigRoomBuilder().capacity(1).build();
+        Room notFullRoom2 = sampleSmallRoomBuilder().build();
+
+        roomManager.buildRoom(fullRoom1);
+        roomManager.buildRoom(fullRoom2);
+        roomManager.buildRoom(notFullRoom1);
+        roomManager.buildRoom(notFullRoom2);
+
+        assertThat(roomManager.findFreeRoom())
+                .usingFieldByFieldElementComparator()
+                .containsOnly(notFullRoom1,notFullRoom2);
+
     }
 
-
     @Test
-    public void deleteRoomWithNonExistingId() {
-        Room room = newRoom(5,5,true);
-        room.setId(1L);
-        expectedException.expect(EntityNotFoundException.class);
-        roomManager.deleteRoom(room);
-    }
+    public void findRoomById() {
+        Room room = sampleBigRoomBuilder().build();
+        roomManager.buildRoom(room);
+        Long roomId = room.getId();
 
-
-    @Test
-    public void findFreeRoom() throws Exception {
-
-    }
-
-    @Test
-    public void findRoomById() throws Exception {
+        assertThat(roomManager.findRoomById(roomId))
+                .isEqualTo(room);
 
     }
 
     @Test
     public void listAllRooms() {
-        assertTrue(roomManager.listAllRooms().isEmpty());
+        assertThat(roomManager.listAllRooms()).isEmpty();
 
-        Room r1 = newRoom(5,5,true);
-        Room r2 = newRoom(4,4,false);
+        Room r1 = sampleBigRoomBuilder().build();
+        Room r2 = sampleSmallRoomBuilder().build();
 
         roomManager.buildRoom(r1);
         roomManager.buildRoom(r2);
 
-        List<Room> expected = Arrays.asList(r1,r2);
-        List<Room> actual = roomManager.listAllRooms();
-
-        actual.sort(ROOM_ID_COMPARATOR);
-        expected.sort(ROOM_ID_COMPARATOR);
-
-
-        assertEquals(expected, actual);
-        assertDeepEquals(expected, actual);
+        assertThat(roomManager.listAllRooms())
+                .usingFieldByFieldElementComparator()
+                .containsOnly(r1,r2);
 
     }
 
-    private static Room newRoom(int floorNumber, int capacity, boolean balcony) {
-        Room room = new Room();
-        room.setFloorNumber(floorNumber);
-        room.setCapacity(capacity);
-        room.setBalcony(balcony);
-        return room;
-    }
-
-
-    private void assertDeepEquals(List<Room> expectedList, List<Room> actualList) {
-        for (int i = 0; i < expectedList.size(); i++) {
-            Room expected = expectedList.get(i);
-            Room actual = actualList.get(i);
-            assertDeepEquals(expected, actual);
-        }
-    }
-
-
-    private void assertDeepEquals(Room expected, Room actual) {
-        assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getFloorNumber(), actual.getFloorNumber());
-        assertEquals(expected.getCapacity(), actual.getCapacity());
-        assertEquals(expected.isBalcony(), actual.isBalcony());
-    }
-
-    private static final Comparator<Room> ROOM_ID_COMPARATOR =
-            (r1, r2) -> r1.getId().compareTo(r2.getId());
 
 }
