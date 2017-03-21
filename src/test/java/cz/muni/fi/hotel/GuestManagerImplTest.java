@@ -8,15 +8,11 @@ import java.lang.*;
 
 import java.sql.SQLException;
 import java.time.*;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 import org.junit.rules.ExpectedException;
 import static org.assertj.core.api.Assertions.*;
 
 import javax.xml.bind.ValidationException;
 
-import static org.junit.Assert.*;
 
 
 /**
@@ -92,8 +88,8 @@ public class GuestManagerImplTest {
         Guest guest =sampleJohnGuestBuilder()
                 .dateOfBirth(tomorrow.getYear(),tomorrow.getMonth(),tomorrow.getDayOfMonth())
                 .build();
-        expectedException.expect(ValidationException.class);
-        guestManager.createGuest(guest);
+        assertThatThrownBy(() -> guestManager.createGuest(guest))
+                .isInstanceOf(ValidationException.class);
     }
 
     @Test
@@ -126,9 +122,10 @@ public class GuestManagerImplTest {
                 .dateOfBirth(-1,Month.DECEMBER,1)
                 .build();
 
-        expectedException.expect(IllegalArgumentException.class);
-        guestManager.createGuest(guest);
+        assertThatThrownBy(() -> guestManager.createGuest(guest))
+                .isInstanceOf(ValidationException.class);
     }
+
 
     @Test
     public void createGuestWithNonExistingDayOfBirth() {
@@ -136,8 +133,8 @@ public class GuestManagerImplTest {
                 .dateOfBirth(1998,Month.FEBRUARY,32)
                 .build();
 
-        expectedException.expect(IllegalArgumentException.class);
-        guestManager.createGuest(guest);
+        assertThatThrownBy(() -> guestManager.createGuest(guest))
+                .isInstanceOf(ValidationException.class);
     }
 
 
@@ -157,9 +154,8 @@ public class GuestManagerImplTest {
         Guest guest = sampleJohnGuestBuilder()
                 .phoneNumber("+12a871654")
                 .build();
-
-        expectedException.expect(IllegalArgumentException.class);
-        guestManager.createGuest(guest);
+        assertThatThrownBy(() -> guestManager.createGuest(guest))
+                .isInstanceOf(ValidationException.class);
     }
 
 
@@ -212,21 +208,21 @@ public class GuestManagerImplTest {
     }
 
     @FunctionalInterface
-    private static interface Operation<T> {
+    private interface Operation<T> {
         void callOn(T subjectOfOperation);
     }
 
-    private void testUpdateGuestInformation(GuestManagerImplTest.Operation<Guest> updateOperation) {
-        Guest john = sampleJohnGuestBuilder().build();
+    private void testUpdateGuestInformation(Operation<Guest> updateOperation) {
+        Guest johnToUpdate = sampleJohnGuestBuilder().build();
         Guest samantha = sampleSamanthaGuestBuilder().build();
-        guestManager.createGuest(john);
-        guestManager.createGuest(john);
+        guestManager.createGuest(johnToUpdate);
+        guestManager.createGuest(samantha);
 
-        updateOperation.callOn(john);
+        updateOperation.callOn(johnToUpdate);
 
-        guestManager.updateGuestInformation(john);
-        assertThat(guestManager.findGuestById(john.getId()))
-                .isEqualToComparingFieldByField(john);
+        guestManager.updateGuestInformation(johnToUpdate);
+        assertThat(guestManager.findGuestById(johnToUpdate.getId()))
+                .isEqualToComparingFieldByField(johnToUpdate);
 
         assertThat(guestManager.findGuestById(samantha.getId()))
                 .isEqualToComparingFieldByField(samantha);
@@ -236,6 +232,12 @@ public class GuestManagerImplTest {
     @Test(expected = IllegalArgumentException.class)
     public void updateNullGuest() {
         guestManager.updateGuestInformation(null);
+    }
+
+    @Test
+    public void updateGuestName() {
+        testUpdateGuestInformation((guest) -> guest.setName("Stephen Duke"));
+
     }
 
     @Test
@@ -307,28 +309,19 @@ public class GuestManagerImplTest {
     public void updateGuestWithWrongDayOfBirth() {
         Guest guest = sampleJohnGuestBuilder().dateOfBirth(1998,Month.APRIL,15).build();
         guestManager.createGuest(guest);
-        guest.setDateOfBirth(LocalDate.of(1998,11,32));
+        guest.setDateOfBirth(LocalDate.of(1998,Month.JANUARY,32));
 
         expectedException.expect(ValidationException.class);
         guestManager.updateGuestInformation(guest);
 
     }
 
-    @Test
-    public void updateGuestWithWrongMonthOfBirth() {
-        Guest guest = sampleJohnGuestBuilder().dateOfBirth(1998,Month.APRIL,15).build();
-        guestManager.createGuest(guest);
-        guest.setDateOfBirth(LocalDate.of(1998,13,32));
-
-        expectedException.expect(ValidationException.class);
-        guestManager.updateGuestInformation(guest);
-    }
 
     @Test
     public void updateGuestWithWrongYearOfBirth() {
         Guest guest = sampleJohnGuestBuilder().dateOfBirth(1998,Month.APRIL,15).build();
         guestManager.createGuest(guest);
-        guest.setDateOfBirth(LocalDate.of(-1,11,32));
+        guest.setDateOfBirth(LocalDate.of(-1,Month.JANUARY,30));
 
         expectedException.expect(ValidationException.class);
         guestManager.updateGuestInformation(guest);
@@ -376,10 +369,10 @@ public class GuestManagerImplTest {
 
         guestManager.createGuest(john);
         guestManager.createGuest(samantha);
+        Long johnId = john.getId();
 
-        assertThat(guestManager.findGuestById(john.getId()))
-                .usingComparatorForFields(GUEST_ID_COMPARATOR)
-                .isSameAs(john);
+        assertThat(guestManager.findGuestById(johnId))
+                .isEqualToComparingFieldByField(john);
 
     }
 
@@ -401,10 +394,6 @@ public class GuestManagerImplTest {
                 .containsOnly(samantha,anotherSamantha);
 
     }
-
-
-    private static final Comparator<Guest> GUEST_ID_COMPARATOR =
-            (g1, g2) -> g1.getId().compareTo(g2.getId());
 
 
 

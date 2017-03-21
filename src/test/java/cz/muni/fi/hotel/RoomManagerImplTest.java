@@ -100,7 +100,7 @@ public class RoomManagerImplTest {
     }
 
     @FunctionalInterface
-    private static interface Operation<T> {
+    private interface Operation<T> {
         void callOn(T subjectOfOperation);
     }
 
@@ -216,13 +216,17 @@ public class RoomManagerImplTest {
 
     @Test
     public void findRoomById() {
-        Room room = sampleBigRoomBuilder().build();
-        roomManager.buildRoom(room);
-        Long roomId = room.getId();
 
-        assertThat(roomManager.findRoomById(roomId))
-                .isEqualTo(room);
+        Room bigRoom = sampleBigRoomBuilder().build();
+        Room smallRoom = sampleSmallRoomBuilder().build();
 
+        roomManager.buildRoom(bigRoom);
+        roomManager.buildRoom(smallRoom);
+
+        Long bigRoomId = bigRoom.getId();
+
+        assertThat(roomManager.findRoomById(bigRoomId))
+                .isEqualToComparingFieldByField(bigRoom);
     }
 
     @Test
