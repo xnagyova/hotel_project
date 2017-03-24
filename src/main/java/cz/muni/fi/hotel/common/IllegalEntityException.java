@@ -1,4 +1,4 @@
-package cz.muni.fi.hotel;
+package cz.muni.fi.hotel.common;
 
 /**
  * @author kkatanik & snagyova

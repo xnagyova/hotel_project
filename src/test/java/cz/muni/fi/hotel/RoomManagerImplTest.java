@@ -95,8 +95,8 @@ public class RoomManagerImplTest {
     @Test
     public void buildRoomWithZeroCapacity() {
         Room room = sampleBigRoomBuilder().capacity(0).build();
-        expectedException.expect(ValidationException.class);
-        roomManager.buildRoom(room);
+        assertThatThrownBy(() -> roomManager.buildRoom(room))
+                .isInstanceOf(ValidationException.class);
     }
 
     @FunctionalInterface

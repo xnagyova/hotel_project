@@ -1,5 +1,6 @@
 package cz.muni.fi.hotel;
 
+import cz.muni.fi.hotel.common.IllegalEntityException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

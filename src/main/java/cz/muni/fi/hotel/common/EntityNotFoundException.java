@@ -1,4 +1,4 @@
-package cz.muni.fi.hotel;
+package cz.muni.fi.hotel.common;
 
 /**
  * Created by ${KristianKatanik} on 14.03.2017.

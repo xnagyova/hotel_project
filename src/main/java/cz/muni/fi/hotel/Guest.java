@@ -6,7 +6,7 @@ import java.util.Date;
 import static java.lang.Long.compare;
 
 /**
- * Created by User on 8.3.2017.
+ * @author kkatanik & snagyova
  */
 public class Guest  {
 

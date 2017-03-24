@@ -17,7 +17,7 @@ public interface GuestManager {
 
     public List<Guest> findAllGuests();
 
-    public Guest findGuestById(long id);
+    public Guest findGuestById(Long id);
 
     public List<Guest> findGuestByName(String name);
 
