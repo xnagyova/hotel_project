@@ -1,9 +1,16 @@
 package cz.muni.fi.hotel;
 
+import cz.muni.fi.hotel.common.DBUtils;
+import cz.muni.fi.hotel.common.ServiceFailureException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import java.sql.SQLException;
+import javax.sql.DataSource;
+import org.apache.derby.jdbc.EmbeddedDataSource;
+import static org.mockito.Mockito.*;
 
 import javax.xml.bind.ValidationException;
 
@@ -16,17 +23,34 @@ import static org.assertj.core.api.Assertions.*;
 public class RoomManagerImplTest {
 
     private RoomManagerImpl roomManager;
+    private DataSource ds;
 
     @Before
-    public void setUp() throws Exception {
-
+    public void setUp() throws SQLException {
+        ds = prepareDataSource();
+        DBUtils.executeSqlScript(ds,RoomManager.class.getResource("createTables.sql"));
         roomManager = new RoomManagerImpl();
+        roomManager.setDataSource(ds);
+    }
 
+    @After
+    public void tearDown() throws SQLException {
+        // Drop tables after each test
+        DBUtils.executeSqlScript(ds,RoomManager.class.getResource("dropTables.sql"));
     }
 
     @Rule
     // attribute annotated with @Rule annotation must be public :-(
     public ExpectedException expectedException = ExpectedException.none();
+
+    private static DataSource prepareDataSource() throws SQLException {
+        EmbeddedDataSource ds = new EmbeddedDataSource();
+        // we will use in memory database
+        ds.setDatabaseName("memory:roommgr-test");
+        // database is created automatically if it does not exist yet
+        ds.setCreateDatabase("create");
+        return ds;
+    }
 
     private RoomBuilder sampleBigRoomBuilder() {
         return new RoomBuilder()
@@ -243,6 +267,76 @@ public class RoomManagerImplTest {
                 .usingFieldByFieldElementComparator()
                 .containsOnly(r1,r2);
 
+    }
+
+    @Test
+    public void buildRoomWithSqlExceptionThrown() throws SQLException {
+        // Create sqlException, which will be thrown by our DataSource mock
+        // object to simulate DB operation failure
+        SQLException sqlException = new SQLException();
+        // Create DataSource mock object
+        DataSource failingDataSource = mock(DataSource.class);
+        // Instruct our DataSource mock object to throw our sqlException when
+        // DataSource.getConnection() method is called.
+        when(failingDataSource.getConnection()).thenThrow(sqlException);
+        // Configure our manager to use DataSource mock object
+        roomManager.setDataSource(failingDataSource);
+
+        // Create Room instance for our test
+        Room room = sampleSmallRoomBuilder().build();
+
+        // Try to call roomManager.buildRoom(Room) method and expect that
+        // exception will be thrown
+        assertThatThrownBy(() -> roomManager.buildRoom(room))
+                // Check that thrown exception is ServiceFailureException
+                .isInstanceOf(ServiceFailureException.class)
+                // Check if cause is properly set
+                .hasCause(sqlException);
+    }
+
+    // Now we want to test also other methods of GraveManager. To avoid having
+    // couple of method with lots of duplicit code, we will use the similar
+    // approach as with testUpdateGrave(Operation) method.
+
+    private void testExpectedServiceFailureException(Operation<RoomManager> operation) throws SQLException {
+        SQLException sqlException = new SQLException();
+        DataSource failingDataSource = mock(DataSource.class);
+        when(failingDataSource.getConnection()).thenThrow(sqlException);
+        roomManager.setDataSource(failingDataSource);
+        assertThatThrownBy(() -> operation.callOn(roomManager))
+                .isInstanceOf(ServiceFailureException.class)
+                .hasCause(sqlException);
+    }
+
+    @Test
+    public void updateRoomInformationsWithSqlExceptionThrown() throws SQLException {
+        Room room = sampleSmallRoomBuilder().build();
+        roomManager.buildRoom(room);
+        testExpectedServiceFailureException((roomManager) -> roomManager.updateRoomInformation(room));
+    }
+
+    @Test
+    public void findRoomByIdWithSqlExceptionThrown() throws SQLException {
+        Room room = sampleSmallRoomBuilder().build();
+        roomManager.buildRoom(room);
+        testExpectedServiceFailureException((roomManager) -> roomManager.findRoomById(room.getId()));
+    }
+
+    @Test
+    public void deleteRoomWithSqlExceptionThrown() throws SQLException {
+        Room room = sampleSmallRoomBuilder().build();
+        roomManager.buildRoom(room);
+        testExpectedServiceFailureException((roomManager) -> roomManager.deleteRoom(room));
+    }
+
+    @Test
+    public void findAllRoomWithSqlExceptionThrown() throws SQLException {
+        testExpectedServiceFailureException(RoomManager::listAllRooms);
+    }
+
+    @Test
+    public void findFreeRoomsWithSqlExceptionThrown() throws SQLException {
+        testExpectedServiceFailureException(RoomManager::findFreeRoom);
     }
 
 

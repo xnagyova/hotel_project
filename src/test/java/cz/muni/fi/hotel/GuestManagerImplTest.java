@@ -1,16 +1,24 @@
 package cz.muni.fi.hotel;
 
+import cz.muni.fi.hotel.common.DBUtils;
 import cz.muni.fi.hotel.common.IllegalEntityException;
+import cz.muni.fi.hotel.common.ServiceFailureException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.lang.*;
-
 import java.sql.SQLException;
 import java.time.*;
+import javax.sql.DataSource;
+import org.apache.derby.jdbc.EmbeddedDataSource;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
+
+import static java.time.Month.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import javax.xml.bind.ValidationException;
 
@@ -24,13 +32,35 @@ public class GuestManagerImplTest {
 
 
     private GuestManagerImpl guestManager;
+    private DataSource ds;
     private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
+
+    private static DataSource prepareDataSource() throws SQLException {
+        EmbeddedDataSource ds = new EmbeddedDataSource();
+        // we will use in memory database
+        ds.setDatabaseName("memory:guestmgr-test");
+        // database is created automatically if it does not exist yet
+        ds.setCreateDatabase("create");
+        return ds;
+    }
+
+    private static Clock prepareClockMock(ZonedDateTime now) {
+        // We don't need to use Mockito, because java already contais
+        // implementation of Clock which returns fixed time.
+        return Clock.fixed(now.toInstant(), now.getZone());
+    }
 
     @Before
     public void setUp() throws SQLException {
+        ds = prepareDataSource();
+        DBUtils.executeSqlScript(ds,GuestManager.class.getResource("createTables.sql"));
+        guestManager = new GuestManagerImpl(prepareClockMock(TODAY));
+        guestManager.setDataSource(ds);
+    }
 
-        guestManager = new GuestManagerImpl();
-
+    @After
+    public void tearDown() throws SQLException {
+        DBUtils.executeSqlScript(ds,GuestManager.class.getResource("dropTables.sql"));
     }
 
     @Rule
@@ -395,6 +425,80 @@ public class GuestManagerImplTest {
                 .containsOnly(samantha,anotherSamantha);
 
     }
+
+    @Test
+    public void createGuestWithSqlExceptionThrown() throws SQLException {
+        // Create sqlException, which will be thrown by our DataSource mock
+        // object to simulate DB operation failure
+        SQLException sqlException = new SQLException();
+        // Create DataSource mock object
+        DataSource failingDataSource = mock(DataSource.class);
+        // Instruct our DataSource mock object to throw our sqlException when
+        // DataSource.getConnection() method is called.
+        when(failingDataSource.getConnection()).thenThrow(sqlException);
+        // Configure our manager to use DataSource mock object
+        guestManager.setDataSource(failingDataSource);
+
+        // Create Guest instance for our test
+        Guest guest = sampleJohnGuestBuilder().build();
+
+        // Try to call guestManager.createGuest(Guest) method and expect that exception
+        // will be thrown
+        assertThatThrownBy(() -> guestManager.createGuest(guest))
+                // Check that thrown exception is ServiceFailureException
+                .isInstanceOf(ServiceFailureException.class)
+                // Check if cause is properly set
+                .hasCause(sqlException);
+    }
+
+    // Now we want to test also other methods of GuestManager. To avoid having
+    // couple of method with lots of duplicit code, we will use the similar
+    // approach as with testUpdateGuest(Operation) method.
+
+    private void testExpectedServiceFailureException(Operation<GuestManager> operation) throws SQLException {
+        SQLException sqlException = new SQLException();
+        DataSource failingDataSource = mock(DataSource.class);
+        when(failingDataSource.getConnection()).thenThrow(sqlException);
+        guestManager.setDataSource(failingDataSource);
+        assertThatThrownBy(() -> operation.callOn(guestManager))
+                .isInstanceOf(ServiceFailureException.class)
+                .hasCause(sqlException);
+    }
+
+    @Test
+    public void updateBodyWithSqlExceptionThrown() throws SQLException {
+        Guest guest = sampleJohnGuestBuilder().build();
+        guestManager.createGuest(guest);
+        testExpectedServiceFailureException((guestManager) -> guestManager.updateGuestInformation(guest));
+    }
+
+    @Test
+    public void findGuestByIdWithSqlExceptionThrown() throws SQLException {
+        Guest guest = sampleJohnGuestBuilder().build();
+        guestManager.createGuest(guest);
+        testExpectedServiceFailureException((guestManager) -> guestManager.findGuestById(guest.getId()));
+    }
+
+    @Test
+    public void findGuestByNameWithSqlExceptionThrown() throws SQLException {
+        Guest guest = sampleJohnGuestBuilder().build();
+        guestManager.createGuest(guest);
+        testExpectedServiceFailureException((guestManager) -> guestManager.findGuestByName(guest.getName()));
+    }
+
+    @Test
+    public void deleteGuestWithSqlExceptionThrown() throws SQLException {
+        Guest guest = sampleJohnGuestBuilder().build();
+        guestManager.createGuest(guest);
+        testExpectedServiceFailureException((guestManager) -> guestManager.deleteGuest(guest));
+    }
+
+    @Test
+    public void findAllGuestsWithSqlExceptionThrown() throws SQLException {
+        testExpectedServiceFailureException(GuestManager::findAllGuests);
+    }
+
+
 
 
 
