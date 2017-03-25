@@ -46,7 +46,7 @@ public class RoomManagerImplTest {
     private static DataSource prepareDataSource() throws SQLException {
         EmbeddedDataSource ds = new EmbeddedDataSource();
         // we will use in memory database
-        ds.setDatabaseName("memory:roommgr-test");
+        ds.setDatabaseName("memory:hotelmgr-test");
         // database is created automatically if it does not exist yet
         ds.setCreateDatabase("create");
         return ds;

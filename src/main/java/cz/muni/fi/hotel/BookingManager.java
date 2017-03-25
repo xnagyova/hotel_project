@@ -1,9 +1,10 @@
 package cz.muni.fi.hotel;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
- * Created by User on 8.3.2017.
+ * @author kkatanik & snagyova
  */
 public interface BookingManager {
 
@@ -13,13 +14,13 @@ public interface BookingManager {
 
     public void updateBooking(Booking booking);
 
-    public Collection <Booking> findAllBookings();
+    public List<Booking> findAllBookings();
 
     public Booking getBookingById(long id);
 
-    public Collection <Booking> findAllBookingsOfGuest(Guest guest);
+    public List <Booking> findAllBookingsOfGuest(Guest guest);
 
-    public Collection <Booking> findAllBookingsOfRoom(Room room);
+    public List <Booking> findAllBookingsOfRoom(Room room);
 
 
 }

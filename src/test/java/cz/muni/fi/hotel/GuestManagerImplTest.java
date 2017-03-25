@@ -38,7 +38,7 @@ public class GuestManagerImplTest {
     private static DataSource prepareDataSource() throws SQLException {
         EmbeddedDataSource ds = new EmbeddedDataSource();
         // we will use in memory database
-        ds.setDatabaseName("memory:guestmgr-test");
+        ds.setDatabaseName("memory:hotelmgr-test");
         // database is created automatically if it does not exist yet
         ds.setCreateDatabase("create");
         return ds;
@@ -451,9 +451,6 @@ public class GuestManagerImplTest {
                 .hasCause(sqlException);
     }
 
-    // Now we want to test also other methods of GuestManager. To avoid having
-    // couple of method with lots of duplicit code, we will use the similar
-    // approach as with testUpdateGuest(Operation) method.
 
     private void testExpectedServiceFailureException(Operation<GuestManager> operation) throws SQLException {
         SQLException sqlException = new SQLException();

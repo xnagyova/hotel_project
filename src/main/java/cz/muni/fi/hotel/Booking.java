@@ -1,17 +1,27 @@
 package cz.muni.fi.hotel;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
- * Created by User on 8.3.2017.
+ * @author kkatanik & snagyova
  */
 public class Booking {
 
+    private Long id;
     private int price;
     private Room room;
     private Guest guest;
-    private Date arrivalDate;
-    private Date departureDate;
+    private LocalDate arrivalDate;
+    private LocalDate departureDate;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Booking() {}
 
@@ -39,19 +49,19 @@ public class Booking {
         this.guest = guest;
     }
 
-    public Date getArrivalDate() {
+    public LocalDate getArrivalDate() {
         return arrivalDate;
     }
 
-    public void setArrivalDate(Date arrivalDate) {
+    public void setArrivalDate(LocalDate arrivalDate) {
         this.arrivalDate = arrivalDate;
     }
 
-    public Date getDepartureDate() {
+    public LocalDate getDepartureDate() {
         return departureDate;
     }
 
-    public void setDepartureDate(Date departureDate) {
+    public void setDepartureDate(LocalDate departureDate) {
         this.departureDate = departureDate;
     }
 
