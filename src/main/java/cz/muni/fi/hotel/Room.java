@@ -1,7 +1,7 @@
 package cz.muni.fi.hotel;
 
 /**
- * Created by User on 8.3.2017.
+ * @kkatanik & snagyova
  */
 public class Room {
 
@@ -11,6 +11,13 @@ public class Room {
     private boolean balcony;
 
     public Room() {
+    }
+
+    public Room(Long id, int floorNumber, int capacity, boolean balcony) {
+        this.id = id;
+        this.floorNumber = floorNumber;
+        this.capacity = capacity;
+        this.balcony = balcony;
     }
 
     public Long getId() {

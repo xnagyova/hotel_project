@@ -18,6 +18,13 @@ public class Guest  {
     public Guest() {
     }
 
+    public Guest(Long id, String name, LocalDate dateOfBirth, String phoneNumber) {
+        this.id = id;
+        this.name = name;
+        this.dateOfBirth = dateOfBirth;
+        this.phoneNumber = phoneNumber;
+    }
+
     public Long getId() {
         return id;
     }
