@@ -11,7 +11,6 @@ public interface RoomManager {
     public void buildRoom(Room room);
     public void updateRoomInformation(Room room);
     public void deleteRoom(Room room);
-    public List<Room> findFreeRoom();
     public Room findRoomById(Long id);
     public List<Room> listAllRooms();
 

@@ -38,7 +38,7 @@ public class RoomManagerImpl implements RoomManager{
         checkDataSource();
         validate(room);
         if (room.getId() != null) {
-            throw new IllegalEntityException("grave id is already set");
+            throw new IllegalEntityException("room id is already set");
         }
         Connection conn = null;
         PreparedStatement st = null;
@@ -52,7 +52,7 @@ public class RoomManagerImpl implements RoomManager{
                     Statement.RETURN_GENERATED_KEYS);
             st.setInt(1, room.getFloorNumber());
             st.setInt(2, room.getCapacity());
-            st.setBoolean(3, room.isBalcony());
+            st.setInt(3, room.isBalcony()?1:0);
 
 
             int count = st.executeUpdate();
@@ -90,7 +90,7 @@ public class RoomManagerImpl implements RoomManager{
                     "UPDATE Room SET floorNumber = ?, capacity = ?, balcony = ? WHERE id = ?");
             st.setInt(1, room.getFloorNumber());
             st.setInt(2, room.getCapacity());
-            st.setBoolean(3, room.isBalcony());
+            st.setInt(3, room.isBalcony()?1:0);
             st.setLong(4, room.getId());
 
             int count = st.executeUpdate();
@@ -141,10 +141,6 @@ public class RoomManagerImpl implements RoomManager{
 
     }
 
-    @Override
-    public List<Room> findFreeRoom() {
-        return null;
-    }
 
     @Override
     public Room findRoomById(Long id) {

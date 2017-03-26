@@ -22,5 +22,7 @@ public interface BookingManager {
 
     public List <Booking> findAllBookingsOfRoom(Room room);
 
+    public List<Room> findFreeRoom();
+
 
 }

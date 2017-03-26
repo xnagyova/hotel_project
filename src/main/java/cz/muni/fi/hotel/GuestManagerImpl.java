@@ -206,7 +206,27 @@ public class GuestManagerImpl implements GuestManager {
     }
 
     public List<Guest> findGuestByName(String name) {
-        return null;
+        checkDataSource();
+
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+
+        Connection conn = null;
+        PreparedStatement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.prepareStatement(
+                    "SELECT id, name, dateOfBirth, phoneNumber FROM Guest WHERE name = ?");
+            st.setString(1, name);
+            return executeQueryForMultipleGuests(st);
+        } catch (SQLException ex) {
+            String msg = "Error when getting guest with name = " + name + " from DB";
+            logger.log(Level.SEVERE, msg, ex);
+            throw new ServiceFailureException(msg, ex);
+        } finally {
+            DBUtils.closeQuietly(conn, st);
+        }
     }
 
     static Guest executeQueryForSingleGuest(PreparedStatement st) throws SQLException, ServiceFailureException {

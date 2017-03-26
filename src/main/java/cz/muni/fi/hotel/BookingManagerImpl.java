@@ -148,6 +148,8 @@ public class BookingManagerImpl implements BookingManager{
         return null;
     }
 
+    public List<Room> findFreeRoom(){return null;}
+
     public List<Booking> findAllBookingsOfGuest(Guest guest) {
         /*
         checkDataSource();
