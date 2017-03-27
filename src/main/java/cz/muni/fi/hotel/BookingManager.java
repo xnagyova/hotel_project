@@ -16,13 +16,13 @@ public interface BookingManager {
 
     public List<Booking> findAllBookings();
 
-    public Booking getBookingById(long id);
+    public Booking getBookingById(Long id);
 
     public List <Booking> findAllBookingsOfGuest(Guest guest);
 
     public List <Booking> findAllBookingsOfRoom(Room room);
 
-    public List<Room> findFreeRoom();
+
 
 
 }

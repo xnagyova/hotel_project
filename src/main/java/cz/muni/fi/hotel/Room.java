@@ -1,7 +1,7 @@
 package cz.muni.fi.hotel;
 
 /**
- * @kkatanik & snagyova
+ * @author kkatanik & nagyova
  */
 public class Room {
 

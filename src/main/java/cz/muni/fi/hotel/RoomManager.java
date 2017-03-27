@@ -13,6 +13,7 @@ public interface RoomManager {
     public void deleteRoom(Room room);
     public Room findRoomById(Long id);
     public List<Room> listAllRooms();
+    public List<Room> findFreeRooms();
 
 
 }

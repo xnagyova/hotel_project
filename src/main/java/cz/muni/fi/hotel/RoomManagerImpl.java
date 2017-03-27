@@ -44,8 +44,6 @@ public class RoomManagerImpl implements RoomManager{
         PreparedStatement st = null;
         try {
             conn = dataSource.getConnection();
-            // Temporary turn autocommit mode off. It is turned back on in
-            // method DBUtils.closeQuietly(...)
             conn.setAutoCommit(false);
             st = conn.prepareStatement(
                     "INSERT INTO Room (floorNumber,capacity,balcony) VALUES (?,?,?)",
@@ -186,6 +184,25 @@ public class RoomManagerImpl implements RoomManager{
         }
     }
 
+    public List<Room> findFreeRooms(){
+        checkDataSource();
+        Connection conn =  null;
+        PreparedStatement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.prepareStatement(
+                    "SELECT id, floorNumber, capacity, balcony FROM Room WHERE room NOT IN (SELECT room FROM booking WHERE room is not null)");
+            return executeQueryForMultipleRooms(st);
+        }catch (SQLException ex) {
+            String msg = "Error when getting free rooms from DB";
+            logger.log(Level.SEVERE, msg, ex);
+            throw new ServiceFailureException(msg, ex);
+        } finally {
+            DBUtils.closeQuietly(conn, st);
+
+        }
+        }
+
     static Room executeQueryForSingleRoom(PreparedStatement st) throws SQLException, ServiceFailureException {
         ResultSet rs = st.executeQuery();
         if (rs.next()) {
@@ -226,8 +243,8 @@ public class RoomManagerImpl implements RoomManager{
         if (room.getFloorNumber() < 0) {
             throw new ValidationException("floorNumber is negative number");
         }
-        if (room.getCapacity() <= 0) {
-            throw new ValidationException("capacity is not positive number");
+        if (room.getCapacity() < 0) {
+            throw new ValidationException("capacity is negative number");
         }
     }
 }

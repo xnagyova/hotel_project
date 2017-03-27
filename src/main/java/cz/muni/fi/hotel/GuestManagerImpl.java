@@ -274,7 +274,7 @@ public class GuestManagerImpl implements GuestManager {
         if (guest.getName() == null) {
             throw new ValidationException("name is null");
         }
-        if (guest.getDateOfBirth() != null ) {
+        if (guest.getDateOfBirth() == null ) {
             throw new ValidationException("dateOfBirth is null");
         }
         LocalDate today = LocalDate.now(clock);

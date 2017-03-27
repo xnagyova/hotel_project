@@ -1,33 +1,37 @@
 package cz.muni.fi.hotel;
 
-import cz.muni.fi.hotel.common.DBUtils;
-import cz.muni.fi.hotel.common.IllegalEntityException;
-import cz.muni.fi.hotel.common.ServiceFailureException;
-import cz.muni.fi.hotel.common.ValidationException;
+import cz.muni.fi.hotel.common.*;
+
+import java.sql.SQLException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+
 
 /**
  * @author kkatanik & snagyova
  */
 public class BookingManagerImpl implements BookingManager{
 
-    private static final Logger logger = Logger.getLogger(
-            BookingManagerImpl.class.getName());
 
     private DataSource dataSource;
-    private final Clock clock;
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
+            GuestManagerImpl.class.getName());
 
-    public BookingManagerImpl(Clock clock) {
-        this.clock = clock;
-    }
+
+
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -140,49 +144,83 @@ public class BookingManagerImpl implements BookingManager{
 
     }
 
+    static List<Booking> executeQueryForMultipleBookings(PreparedStatement st) throws SQLException {
+        ResultSet rs = st.executeQuery();
+        List<Booking> result = new ArrayList<Booking>();
+        while (rs.next()) {
+            result.add(rowToBooking(rs));
+        }
+        return result;
+    }
+
+    static private Booking rowToBooking(ResultSet rs) throws SQLException {
+        Booking result = new Booking();
+        Room room = new Room();
+
+        result.setId(rs.getLong("id"));
+        result.setPrice(rs.getInt("price"));
+        //result.setGuest(rs.getObject("guest"));
+        //result.setRoom(rs.getObject(room,"room"));
+        result.setArrivalDate(toLocalDate(rs.getDate("arrivalDate")));
+        result.setDepartureDate(toLocalDate(rs.getDate("departureDate")));
+        return result;
+    }
+
     public List<Booking> findAllBookings() {
-        return null;
-    }
 
-    public Booking getBookingById(long id) {
-        return null;
-    }
-
-    public List<Room> findFreeRoom(){return null;}
-
-    public List<Booking> findAllBookingsOfGuest(Guest guest) {
-        /*
         checkDataSource();
-        if (guest == null) {
-            throw new IllegalArgumentException("guest is null");
-        }
-        if (guest.getId() == null) {
-            throw new IllegalEntityException("guest id is null");
-        }
-        Connection conn = null;
+        Connection conn =  null;
         PreparedStatement st = null;
         try {
             conn = dataSource.getConnection();
             st = conn.prepareStatement(
-                    "SELECT Body.id, name, gender, born, died, vampire " +
-                            "FROM Body JOIN Grave ON Grave.id = Body.graveId " +
-                            "WHERE Grave.id = ?");
-            st.setLong(1, grave.getId());
-            return BodyManagerImpl.executeQueryForMultipleBodies(st);
-        } catch (SQLException ex) {
-            String msg = "Error when trying to find bodies in grave " + grave;
+                    "SELECT id, price, room, guest, arrivalDate, departureDate FROM Booking");
+            return executeQueryForMultipleBookings(st);
+        }catch (SQLException ex) {
+            String msg = "Error when getting all bodies from DB";
             logger.log(Level.SEVERE, msg, ex);
             throw new ServiceFailureException(msg, ex);
         } finally {
             DBUtils.closeQuietly(conn, st);
         }
     }
-    */
-        return null;
+
+    @Override
+    public Booking getBookingById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id is null");
+        }
+
+        checkDataSource();
+        Connection conn =  null;
+        PreparedStatement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.prepareStatement(
+                    "SELECT id, price, guest, room, arrivalDate, departureDate FROM Booking WHERE id = ?");
+            st.setLong(1, id);
+            return executeQueryForSingleBooking(st);
+        }catch (SQLException ex) {
+            String msg = "Error when getting booking with id = " + id + " from DB";
+            logger.log(Level.SEVERE, msg, ex);
+            throw new ServiceFailureException(msg, ex);
+        } finally {
+            DBUtils.closeQuietly(conn, st);
+        }
     }
 
-    public List<Booking> findAllBookingsOfRoom(Room room) {
-        return null;
+    static Booking executeQueryForSingleBooking(PreparedStatement st) throws SQLException, ServiceFailureException {
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            Booking result = rowToBooking(rs);
+            if (rs.next()) {
+                throw new ServiceFailureException(
+                        "Internal integrity error: more bookings with the same id found!");
+            }
+            return result;
+        } else {
+            return null;
+        }
     }
 
     private void validate(Booking booking) {
@@ -195,15 +233,76 @@ public class BookingManagerImpl implements BookingManager{
         if (booking.getGuest() == null ) {
             throw new ValidationException("guest is null");
         }
-        LocalDate today = LocalDate.now(clock);
+
         if (booking.getArrivalDate() == null) {
-            throw new ValidationException("arrivalDate is null");
+            throw new ValidationException("arrival date is null");
         }
         if (booking.getDepartureDate() == null) {
-            throw new ValidationException("departureDate is null");
+            throw new ValidationException("departure date is null");
         }
-        if ( booking.getArrivalDate().isAfter(booking.getDepartureDate())) {
-            throw new ValidationException("arrivalDate is after departureDate");
+
+        LocalDate arrival = booking.getArrivalDate();
+        LocalDate departure= booking.getDepartureDate();
+        if (arrival != null && departure!= null && arrival.isAfter(departure)) {
+            throw new ValidationException("the arrival date cannot be set after departure date");
+        }
+
+    }
+
+
+
+    public List<Booking> findAllBookingsOfGuest(Guest guest) {
+
+        checkDataSource();
+        if (guest == null) {
+            throw new IllegalArgumentException("guest is null");
+        }
+        if (guest.getId() == null) {
+            throw  new IllegalArgumentException("Id of guest is null");
+        }
+        Connection conn =  null;
+        PreparedStatement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.prepareStatement(
+                    "SELECT id, price, room, guest, arrivalDate, departureDate FROM Booking WHERE guest = ?");
+            st.setObject(4, guest);
+            return executeQueryForMultipleBookings(st);
+        }catch (SQLException ex) {
+            String msg = "Error when getting bookings of guest from DB";
+            logger.log(Level.SEVERE, msg, ex);
+            throw new ServiceFailureException(msg, ex);
+        } finally {
+            DBUtils.closeQuietly(conn, st);
+        }
+
+
+
+    }
+
+    public List<Booking> findAllBookingsOfRoom(Room room) {
+
+        checkDataSource();
+        if (room == null) {
+            throw new IllegalArgumentException("room is null");
+        }
+        if (room.getId() == null) {
+            throw  new IllegalArgumentException("Id of room is null");
+        }
+        Connection conn =  null;
+        PreparedStatement st = null;
+        try {
+            conn = dataSource.getConnection();
+            st = conn.prepareStatement(
+                    "SELECT id, price, room, guest, arrivalDate, departureDate FROM Booking WHERE room = ?");
+            st.setObject(3, room);
+            return executeQueryForMultipleBookings(st);
+        }catch (SQLException ex) {
+            String msg = "Error when getting bookings of room from DB";
+            logger.log(Level.SEVERE, msg, ex);
+            throw new ServiceFailureException(msg, ex);
+        } finally {
+            DBUtils.closeQuietly(conn, st);
         }
     }
 
