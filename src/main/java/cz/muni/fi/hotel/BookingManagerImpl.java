@@ -28,13 +28,13 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
  * @author kkatanik & snagyova
  */
 public class BookingManagerImpl implements BookingManager {
-    private final static Logger log = LoggerFactory.getLogger(BookingManagerImpl.class);
+    final static Logger log = LoggerFactory.getLogger(BookingManagerImpl.class);
     private JdbcTemplate jdbc;
     private RoomManager roomManager;
     private GuestManager guestManager;
 
-    public BookingManagerImpl(DataSource dataSource) {
-        jdbc = new JdbcTemplate(dataSource);
+    public BookingManagerImpl(DataSource ds){
+        jdbc = new JdbcTemplate(ds);
     }
 
     public void setRoomManager(RoomManager roomManager) {
@@ -118,7 +118,7 @@ public class BookingManagerImpl implements BookingManager {
     @Override
     public void updateBooking(Booking booking) {
         jdbc.update("UPDATE bookings set price=?,roomId=?,guestId=?, arrivalDate=?, departureDate=? where id=?",
-                booking.getPrice(), booking.getRoom(), booking.getGuest(),booking.getArrivalDate(),
+                booking.getPrice(), booking.getRoom().getId(), booking.getGuest().getId(),booking.getArrivalDate(),
                 booking.getDepartureDate(),booking.getId());
     }
 

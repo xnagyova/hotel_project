@@ -1,9 +1,5 @@
 package cz.muni.fi.hotel;
 
-import cz.muni.fi.hotel.common.DBUtils;
-import cz.muni.fi.hotel.common.IllegalEntityException;
-import cz.muni.fi.hotel.common.ServiceFailureException;
-import cz.muni.fi.hotel.common.ValidationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -13,20 +9,11 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.Collection;
 import java.util.List;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.Clock;
+import java.util.HashMap;
+import java.util.Map;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 /**
@@ -34,16 +21,15 @@ import javax.sql.DataSource;
  */
 public class GuestManagerImpl implements GuestManager {
     private JdbcTemplate jdbc;
-    private TransactionTemplate transaction;
+
 
     public GuestManagerImpl(DataSource dataSource) {
         this.jdbc = new JdbcTemplate(dataSource);
-        this.transaction = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
     }
 
     @Override
-    public void deleteGuest(Guest guest) {
-        jdbc.update("DELETE FROM guests WHERE id=?", guest.getId());
+    public void deleteGuest(Long id) {
+        jdbc.update("DELETE FROM guests WHERE id=?", id);
     }
 
     @Override
@@ -54,8 +40,8 @@ public class GuestManagerImpl implements GuestManager {
 
     private RowMapper<Guest> guestMapper = (rs, rowNum) ->
             new Guest(rs.getLong("id"), rs.getString("name"),
-                    rs.getObject("dateOfBirth",LocalDate.class), rs.getString("phoneNumber"));
-
+                    rs.getObject("dateOfBirth", LocalDate.class), rs.getString("phoneNumber"));
+    @Transactional
     @Override
     public List<Guest> findAllGuests() {
         return jdbc.query("SELECT * FROM guests", guestMapper);

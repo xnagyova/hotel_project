@@ -1,5 +1,6 @@
 package cz.muni.fi.hotel;
 
+import cz.muni.fi.hotel.common.BookingException;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -16,10 +17,17 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Properties;
 
 public class Main {
 
-    public static void main(String[] args) throws  IOException {
+    public static void main(String[] args) throws BookingException, IOException {
+
+        Properties myconf = new Properties();
+        myconf.load(Main.class.getResourceAsStream("/myconf.properties"));
+
+
 
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
         GuestManager guestManager = ctx.getBean(GuestManager.class);
@@ -31,6 +39,7 @@ public class Main {
 
         Guest guest = new Guest(null, "Jan Novák", LocalDate.of (1986,05,4), "602123456");
         guestManager.createGuest(guest);
+
 
     }
 
@@ -45,6 +54,7 @@ public class Main {
         @Bean
         public DataSource dataSource() {
             BasicDataSource bds = new BasicDataSource(); //Apache DBCP connection pooling DataSource
+            bds.setConnectionProperties("create=true");
             bds.setDriverClassName(env.getProperty("jdbc.driver"));
             bds.setUrl(env.getProperty("jdbc.url"));
             bds.setUsername(env.getProperty("jdbc.user"));
@@ -75,5 +85,17 @@ public class Main {
             bookingManager.setGuestManager(guestManager());
             return bookingManager;
         }
+
+
     }
+    /*
+    Room room = allRooms.get(0);
+    Guest guest = allGuests.get(0);
+    Booking booking = new Booking(null, 35, room, guest, LocalDate.now(),LocalDate.now().plusDays(30));
+    BookingManager bookingManager =
+        leaseManager.createLease(lease);
+
+    List<Lease> leasesForCustomer = leaseManager.getLeasesForCustomer(customer);
+        System.out.println("leasesForCustomer = " + leasesForCustomer);
+        */
 }

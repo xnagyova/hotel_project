@@ -11,7 +11,7 @@ public interface GuestManager {
 
     public void createGuest(Guest guest);
 
-    public void deleteGuest(Guest guest);
+    public void deleteGuest(Long id);
 
     public void updateGuestInformation(Guest guest);
 

@@ -1,7 +1,3 @@
-DROP TABLE IF EXISTS bookings;
-  DROP TABLE IF EXISTS guests;
-  DROP TABLE IF EXISTS rooms;
-
  CREATE TABLE rooms  (
    id BIGINT PRIMARY KEY,
    floorNumber   INT,

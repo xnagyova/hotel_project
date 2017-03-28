@@ -190,7 +190,7 @@ public class RoomManagerImplTest {
         testUpdateRoomInformation((room) -> room.setBalcony(false));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void updateNullRoom() {
         roomManager.updateRoomInformation(null);
     }
@@ -236,7 +236,7 @@ public class RoomManagerImplTest {
         assertThat(roomManager.findRoomById(r1.getId())).isNotNull();
         assertThat(roomManager.findRoomById(r2.getId())).isNotNull();
 
-        roomManager.deleteRoom(r1);
+        roomManager.deleteRoom(r1.getId());
 
         assertThat(roomManager.findRoomById(r1.getId())).isNull();
         assertThat(roomManager.findRoomById(r2.getId())).isNotNull();

@@ -10,7 +10,7 @@ public interface RoomManager {
 
     public void buildRoom(Room room);
     public void updateRoomInformation(Room room);
-    public void deleteRoom(Room room);
+    public void deleteRoom(Long id);
     public Room findRoomById(Long id);
     public List<Room> listAllRooms();
     public List<Room> findFreeRooms();

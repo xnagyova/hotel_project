@@ -39,8 +39,7 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 @RunWith(SpringJUnit4ClassRunner.class) //Spring se zúčastní unit testů
 @ContextConfiguration(classes = {MySpringTestConfig.class}) //konfigurace je ve třídě MySpringTestConfig
 public class GuestManagerImplTest {
-    private EmbeddedDatabase db;
-    //private GuestManagerImpl guestManager;
+
     private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
 
     @Autowired
@@ -226,7 +225,7 @@ public class GuestManagerImplTest {
         assertThat(guestManager.findGuestById(john.getId())).isNotNull();
         assertThat(guestManager.findGuestById(samantha.getId())).isNotNull();
 
-        guestManager.deleteGuest(john);
+        guestManager.deleteGuest(john.getId());
         assertThat(guestManager.findGuestById(john.getId())).isNull();
         assertThat(guestManager.findGuestById(samantha.getId())).isNotNull();
 
