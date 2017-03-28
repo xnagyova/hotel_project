@@ -4,6 +4,12 @@ import cz.muni.fi.hotel.common.DBUtils;
 import cz.muni.fi.hotel.common.IllegalEntityException;
 import cz.muni.fi.hotel.common.ServiceFailureException;
 import cz.muni.fi.hotel.common.ValidationException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +32,58 @@ import javax.sql.DataSource;
  */
 public class GuestManagerImpl implements GuestManager {
 
+    private JdbcTemplate jdbc;
+
+    public GuestManagerImpl(DataSource dataSource) {
+        this.jdbc = new JdbcTemplate(dataSource);
+    }
+
+    @Override
+    public void deleteGuest(Guest guest) {
+        jdbc.update("DELETE FROM guest WHERE id=?", guest.getId());
+    }
+
+    @Override
+    public void updateGuestInformation(Guest guest) {
+        jdbc.update("UPDATE guest set name=?,dateOfBirth=?,phoneNumber=? where id=?",
+                guest.getName(), guest.getDateOfBirth(), guest.getPhoneNumber(),guest.getId());
+    }
+
+    private RowMapper<Guest> guestMapper = (rs, rowNum) ->
+            new Guest(rs.getLong("id"), rs.getString("name"),
+                    rs.getObject("dateOfBirth",LocalDate.class), rs.getString("phoneNumber"));
+
+    @Transactional
+    @Override
+    public List<Guest> findAllGuests() {
+        return jdbc.query("SELECT * FROM guest", guestMapper);
+    }
+
+    @Override
+    public Guest findGuestById(Long id) {
+        return jdbc.queryForObject("SELECT * FROM guest WHERE id=?", guestMapper, id);
+    }
+
+    @Override
+    public List<Guest> findGuestByName(String name){
+        return jdbc.query("SELECT * FROM guest WHERE name=?", guestMapper, name);
+    }
+
+
+    @Override
+    public void createGuest(Guest guest) {
+        SimpleJdbcInsert insertGuest = new SimpleJdbcInsert(jdbc)
+                .withTableName("guest").usingGeneratedKeyColumns("id");
+
+        SqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("name", guest.getName())
+                .addValue("dateOfBirth", guest.getDateOfBirth())
+                .addValue("phoneNumber", guest.getPhoneNumber());
+
+        Number id = insertGuest.executeAndReturnKey(parameters);
+        guest.setId(id.longValue());
+    }
+    /*
     private static final Logger logger = Logger.getLogger(
             GuestManagerImpl.class.getName());
 
@@ -292,5 +350,5 @@ public class GuestManagerImpl implements GuestManager {
 
     private static LocalDate toLocalDate(Date date) {
         return date == null ? null : date.toLocalDate();
-    }
+    }*/
 }

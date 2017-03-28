@@ -53,14 +53,14 @@ public class GuestManagerImplTest {
     @Before
     public void setUp() throws SQLException {
         ds = prepareDataSource();
-        DBUtils.executeSqlScript(ds,GuestManager.class.getResource("createTables.sql"));
+        DBUtils.executeSqlScript(ds,GuestManager.class.getResource("schema-javadb.sql"));
         guestManager = new GuestManagerImpl(prepareClockMock(TODAY));
         guestManager.setDataSource(ds);
     }
 
     @After
     public void tearDown() throws SQLException {
-        DBUtils.executeSqlScript(ds,GuestManager.class.getResource("dropTables.sql"));
+        DBUtils.executeSqlScript(ds,GuestManager.class.getResource("schema-psql.sql"));
     }
 
     @Rule

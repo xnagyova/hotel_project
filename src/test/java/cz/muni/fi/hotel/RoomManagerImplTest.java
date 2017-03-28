@@ -28,7 +28,7 @@ public class RoomManagerImplTest {
     @Before
     public void setUp() throws SQLException {
         ds = prepareDataSource();
-        DBUtils.executeSqlScript(ds,RoomManager.class.getResource("createTables.sql"));
+        DBUtils.executeSqlScript(ds,RoomManager.class.getResource("schema-javadb.sql"));
         roomManager = new RoomManagerImpl();
         roomManager.setDataSource(ds);
     }
@@ -36,7 +36,7 @@ public class RoomManagerImplTest {
     @After
     public void tearDown() throws SQLException {
         // Drop tables after each test
-        DBUtils.executeSqlScript(ds,RoomManager.class.getResource("dropTables.sql"));
+        DBUtils.executeSqlScript(ds,RoomManager.class.getResource("schema-psql.sql"));
     }
 
     @Rule
@@ -220,7 +220,7 @@ public class RoomManagerImplTest {
 
     @Test
     public void findFreeRoom() {
-        assertThat(roomManager.findFreeRoom()).isEmpty();
+        assertThat(roomManager.findFreeRooms()).isEmpty();
 
         Room fullRoom1 = sampleBigRoomBuilder().capacity(0).build();
         Room fullRoom2 = sampleSmallRoomBuilder().capacity(0).build();
@@ -232,7 +232,7 @@ public class RoomManagerImplTest {
         roomManager.buildRoom(notFullRoom1);
         roomManager.buildRoom(notFullRoom2);
 
-        assertThat(roomManager.findFreeRoom())
+        assertThat(roomManager.findFreeRooms())
                 .usingFieldByFieldElementComparator()
                 .containsOnly(notFullRoom1,notFullRoom2);
 
@@ -336,7 +336,7 @@ public class RoomManagerImplTest {
 
     @Test
     public void findFreeRoomsWithSqlExceptionThrown() throws SQLException {
-        testExpectedServiceFailureException(RoomManager::findFreeRoom);
+        testExpectedServiceFailureException(RoomManager::findFreeRooms);
     }
 
 

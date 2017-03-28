@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Created by User on 8.3.2017.
+ *@author kkatanik & snagyova
  */
 public interface GuestManager {
 

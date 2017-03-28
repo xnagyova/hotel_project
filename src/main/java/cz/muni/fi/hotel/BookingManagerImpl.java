@@ -6,11 +6,15 @@ import java.sql.SQLException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.time.Clock;
-import java.time.LocalDate;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,7 +29,110 @@ import java.sql.ResultSet;
  */
 public class BookingManagerImpl implements BookingManager{
 
+    final static Logger log = LoggerFactory.getLogger(BookingManagerImpl.class);
+    private JdbcTemplate jdbc;
+    private RoomManager roomManager;
+    private GuestManager guestManager;
 
+    public BookingManagerImpl(DataSource dataSource) {
+        jdbc = new JdbcTemplate(dataSource);
+    }
+
+    public void setRoomManager(RoomManager RoomManager) {
+        this.roomManager = roomManager;
+    }
+
+    public void setGuestManager(GuestManager guestManager) {
+        this.guestManager = guestManager;
+    }
+
+    @Override
+    public List<Booking> findAllBookingsOfGuest(final Guest guest){
+        return jdbc.query("SELECT * FROM booking WHERE guestId=?",
+                (rs, rowNum) -> {
+                    int price = rs.getInt("price");
+                    long roomId = rs.getLong("roomId");
+                    Room room = null;
+                    try {
+                        room = roomManager.findRoomById(roomId);
+                    } catch (Exception e) {
+                        log.error("cannot find room", e);
+                    }
+                    LocalDate arrivalDate = rs.getDate("arrivalDate").toLocalDate();
+                    LocalDate departureDate = rs.getDate("departureDate").toLocalDate();
+                    /*Timestamp ts = rs.getTimestamp("realend");
+                    LocalDateTime realend = ts == null ? null : ts.toLocalDateTime();*/
+                    return new Booking(rs.getLong("id"), price, room, guest, arrivalDate, departureDate);
+                },
+                guest.getId());
+    }
+
+    @Override
+    public List<Booking> findAllBookingsOfRoom(final Room room) {
+        return jdbc.query("SELECT * FROM booking WHERE roomId=?",
+                (rs, rowNum) -> {
+                    int price = rs.getInt("price");
+                    long guestId = rs.getLong("guestId");
+                    Guest guest = null;
+                    try {
+                        guest = guestManager.findGuestById(guestId);
+                    } catch (Exception e) {
+                        log.error("cannot find guest", e);
+                    }
+                    LocalDate arrivalDate = rs.getDate("arrivalDate").toLocalDate();
+                    LocalDate departureDate = rs.getDate("departureDate").toLocalDate();
+                    return new Booking(rs.getLong("id"), price, room, guest, arrivalDate, departureDate);
+                },
+                room.getId());
+    }
+
+    @Override
+    public List<Booking> findAllBookings() {
+        return jdbc.query("SELECT * FROM booking", bookingMapper);
+    }
+
+    private RowMapper<Booking> bookingMapper = (rs, rowNum) ->
+            new Booking(rs.getLong("id"), rs.getInt("price"),
+                    rs.getObject("roomId"), rs.getObject("guestId"),
+                    rs.getObject("arrivalDate",LocalDate.class),
+                    rs.getObject("departureDate",LocalDate.class));
+
+    @Override
+    public void createBooking(Booking booking) {
+        SimpleJdbcInsert insertLease = new SimpleJdbcInsert(jdbc).withTableName("booking").usingGeneratedKeyColumns("id");
+        SqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("price",booking.getPrice())
+                .addValue("roomId", booking.getRoom().getId())
+                .addValue("guestId", booking.getGuest().getId())
+                .addValue("arrivalDate", toSQLDate(booking.getArrivalDate()))
+                .addValue("departureDate", toSQLDate(booking.getDepartureDate()));
+        Number id = insertLease.executeAndReturnKey(parameters);
+        booking.setId(id.longValue());
+    }
+
+    @Override
+    public void updateBooking(Booking booking) {
+        jdbc.update("UPDATE booking set price=?,room=?,guest=?, arrivalDate=?, departureDate=? where id=?",
+                booking.getPrice(), booking.getRoom(), booking.getGuest(),booking.getArrivalDate(),
+                booking.getDepartureDate(),booking.getId());
+    }
+
+    @Override
+    public void deleteBooking(Booking booking) {
+        jdbc.update("DELETE FROM booking WHERE id=?", booking.getId());
+    }
+
+    private Date toSQLDate(LocalDate localDate) {
+        if (localDate == null) return null;
+        return new Date(ZonedDateTime.of(localDate.atStartOfDay(), ZoneId.systemDefault()).toInstant().toEpochMilli());
+    }
+
+    private Timestamp toSQLTimestamp(LocalDateTime localDateTime) {
+        if (localDateTime == null) return null;
+        return new Timestamp(ZonedDateTime.of(localDateTime, ZoneId.systemDefault()).toInstant().toEpochMilli());
+    }
+
+/*
     private DataSource dataSource;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(
             GuestManagerImpl.class.getName());
@@ -266,7 +373,7 @@ public class BookingManagerImpl implements BookingManager{
             conn = dataSource.getConnection();
             st = conn.prepareStatement(
                     "SELECT id, price, room, guest, arrivalDate, departureDate FROM Booking WHERE guest = ?");
-            st.setObject(4, guest);
+            st.setObject(1, guest);
             return executeQueryForMultipleBookings(st);
         }catch (SQLException ex) {
             String msg = "Error when getting bookings of guest from DB";
@@ -295,7 +402,7 @@ public class BookingManagerImpl implements BookingManager{
             conn = dataSource.getConnection();
             st = conn.prepareStatement(
                     "SELECT id, price, room, guest, arrivalDate, departureDate FROM Booking WHERE room = ?");
-            st.setObject(3, room);
+            st.setObject(1, room);
             return executeQueryForMultipleBookings(st);
         }catch (SQLException ex) {
             String msg = "Error when getting bookings of room from DB";
@@ -310,7 +417,9 @@ public class BookingManagerImpl implements BookingManager{
         return localDate == null ? null : Date.valueOf(localDate);
     }
 
+
     private static LocalDate toLocalDate(Date date) {
         return date == null ? null : date.toLocalDate();
     }
+    */
 }

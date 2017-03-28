@@ -47,14 +47,14 @@ public class BookingManagerImplTest {
     @Before
     public void setUp() throws SQLException {
         ds = prepareDataSource();
-        DBUtils.executeSqlScript(ds,BookingManager.class.getResource("createTables.sql"));
-        bookingManager = new BookingManagerImpl(prepareClockMock(TODAY));
+        DBUtils.executeSqlScript(ds,BookingManager.class.getResource("schema-javadb.sql"));
+        /*bookingManager = new BookingManagerImpl(prepareClockMock(TODAY));*/
         bookingManager.setDataSource(ds);
     }
 
     @After
     public void tearDown() throws SQLException {
-        DBUtils.executeSqlScript(ds,BookingManager.class.getResource("dropTables.sql"));
+        DBUtils.executeSqlScript(ds,BookingManager.class.getResource("schema-psql.sql"));
     }
 
     @Rule

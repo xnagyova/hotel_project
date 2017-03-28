@@ -4,8 +4,15 @@ import cz.muni.fi.hotel.common.DBUtils;
 import cz.muni.fi.hotel.common.IllegalEntityException;
 import cz.muni.fi.hotel.common.ServiceFailureException;
 import cz.muni.fi.hotel.common.ValidationException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -17,6 +24,58 @@ import javax.sql.DataSource;
  */
 public class RoomManagerImpl implements RoomManager{
 
+    private JdbcTemplate jdbc;
+
+    public RoomManagerImpl(DataSource dataSource) {
+        this.jdbc = new JdbcTemplate(dataSource);
+    }
+
+    @Override
+    public void deleteRoom(Room room) {
+        jdbc.update("DELETE FROM room WHERE id=?", room.getId());
+    }
+
+    @Override
+    public void updateRoomInformation(Room room) {
+        jdbc.update("UPDATE room set floorNumber=?,capacity=?,balcony=? where id=?",
+                room.getFloorNumber(), room.getCapacity(), room.isBalcony()?1:0,room.getId());
+    }
+
+    private RowMapper<Room> roomMapper = (rs, rowNum) ->
+            new Room(rs.getLong("id"), rs.getInt("floorNumber"),
+                    rs.getInt("capacity"), rs.getBoolean("balcony"));
+
+    @Transactional
+    @Override
+    public List<Room> listAllRooms() {
+        return jdbc.query("SELECT * FROM room", roomMapper);
+    }
+
+    @Override
+    public List<Room> findFreeRooms() {
+        return jdbc.query("SELECT * FROM room WHERE capacity > 0", roomMapper);
+    }
+
+    @Override
+    public Room findRoomById(Long id) {
+        return jdbc.queryForObject("SELECT * FROM room WHERE id=?", roomMapper, id);
+    }
+
+
+    @Override
+    public void buildRoom(Room room) {
+        SimpleJdbcInsert insertRoom = new SimpleJdbcInsert(jdbc)
+                .withTableName("room").usingGeneratedKeyColumns("id");
+
+        SqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("floorNumber", room.getFloorNumber())
+                .addValue("capacity", room.getCapacity())
+                .addValue("balcony", room.isBalcony()?1:0);
+
+        Number id = insertRoom.executeAndReturnKey(parameters);
+        room.setId(id.longValue());
+    }
+/*
     private static final Logger logger = Logger.getLogger(
             RoomManagerImpl.class.getName());
 
@@ -246,5 +305,5 @@ public class RoomManagerImpl implements RoomManager{
         if (room.getCapacity() < 0) {
             throw new ValidationException("capacity is negative number");
         }
-    }
+    }*/
 }
