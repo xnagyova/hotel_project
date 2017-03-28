@@ -15,25 +15,47 @@ import javax.sql.DataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static java.time.Month.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import javax.xml.bind.ValidationException;
+import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.DERBY;
 
 
 
 /**
  * @author kkatanik & snagyova
  */
-
+@RunWith(SpringJUnit4ClassRunner.class) //Spring se zúčastní unit testů
+@ContextConfiguration(classes = {MySpringTestConfig.class}) //konfigurace je ve třídě MySpringTestConfig
 public class GuestManagerImplTest {
-
-
-    private GuestManagerImpl guestManager;
-    private DataSource ds;
+    private EmbeddedDatabase db;
+    //private GuestManagerImpl guestManager;
     private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
+
+    @Autowired
+    private GuestManager guestManager;
+
+
+    /*private DataSource ds;
+    private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        ctx = new AnnotationConfigApplicationContext(Main.SpringConfig.class);
+    }
+
+
 
     private static DataSource prepareDataSource() throws SQLException {
         EmbeddedDataSource ds = new EmbeddedDataSource();
@@ -61,7 +83,7 @@ public class GuestManagerImplTest {
     @After
     public void tearDown() throws SQLException {
         DBUtils.executeSqlScript(ds,GuestManager.class.getResource("schema-psql.sql"));
-    }
+    }*/
 
     @Rule
     // attribute annotated with @Rule annotation must be public :-(
@@ -426,7 +448,7 @@ public class GuestManagerImplTest {
 
     }
 
-    @Test
+    /*@Test
     public void createGuestWithSqlExceptionThrown() throws SQLException {
         // Create sqlException, which will be thrown by our DataSource mock
         // object to simulate DB operation failure
@@ -493,7 +515,7 @@ public class GuestManagerImplTest {
     @Test
     public void findAllGuestsWithSqlExceptionThrown() throws SQLException {
         testExpectedServiceFailureException(GuestManager::findAllGuests);
-    }
+    }*/
 
 
 

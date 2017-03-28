@@ -8,19 +8,50 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import javax.sql.DataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
+
 import static org.mockito.Mockito.*;
 
 import javax.xml.bind.ValidationException;
 
 
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.DERBY;
 
 /**
  * @author kkatanik & snagyova
  */
+
+@RunWith(SpringJUnit4ClassRunner.class) //Spring se zúčastní unit testů
+@ContextConfiguration(classes = {MySpringTestConfig.class}) //konfigurace je ve třídě MySpringTestConfig
 public class RoomManagerImplTest {
+    private EmbeddedDatabase db;
+
+    @Autowired
+    private RoomManager roomManager;
+    private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
+    /*@Before
+    public void setUp() throws Exception {
+        db = new EmbeddedDatabaseBuilder().setType(DERBY).addScript("schema-javadb.sql").addScript("my-test-data.sql").build();
+        roomManager = new RoomManagerImpl(db);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        db.shutdown();
+    }*/
+    /*
 
     private RoomManagerImpl roomManager;
     private DataSource ds;
@@ -37,7 +68,7 @@ public class RoomManagerImplTest {
     public void tearDown() throws SQLException {
         // Drop tables after each test
         DBUtils.executeSqlScript(ds,RoomManager.class.getResource("schema-psql.sql"));
-    }
+    }*/
 
     @Rule
     // attribute annotated with @Rule annotation must be public :-(
@@ -268,6 +299,7 @@ public class RoomManagerImplTest {
                 .containsOnly(r1,r2);
 
     }
+    /*
 
     @Test
     public void buildRoomWithSqlExceptionThrown() throws SQLException {
@@ -338,6 +370,7 @@ public class RoomManagerImplTest {
     public void findFreeRoomsWithSqlExceptionThrown() throws SQLException {
         testExpectedServiceFailureException(RoomManager::findFreeRooms);
     }
+    */
 
 
 }
