@@ -57,8 +57,8 @@ public class BookingManagerImpl implements BookingManager {
                     } catch (Exception e) {
                         log.error("cannot find room", e);
                     }
-                    LocalDate arrivalDate = rs.getDate("arrivalDate").toLocalDate();
-                    LocalDate departureDate = rs.getDate("departureDate").toLocalDate();
+                    Date arrivalDate = rs.getDate("arrivalDate");
+                    Date departureDate = rs.getDate("departureDate");
                     return new Booking(rs.getLong("id"), price, room, guest, arrivalDate, departureDate);
                 },
                 guest.getId());
@@ -76,8 +76,8 @@ public class BookingManagerImpl implements BookingManager {
                     } catch (Exception e) {
                         log.error("cannot find guest", e);
                     }
-                    LocalDate arrivalDate = rs.getDate("arrivalDate").toLocalDate();
-                    LocalDate departureDate = rs.getDate("departureDate").toLocalDate();
+                    Date arrivalDate = rs.getDate("arrivalDate");
+                    Date departureDate = rs.getDate("departureDate");
                     return new Booking(rs.getLong("id"), price, room, guest, arrivalDate, departureDate);
                 },
                 room.getId());
@@ -98,8 +98,8 @@ public class BookingManagerImpl implements BookingManager {
             new Booking(rs.getLong("id"), rs.getInt("price"),
                     roomManager.findRoomById(rs.getLong("roomId")),
                     guestManager.findGuestById(rs.getLong("guestId")),
-                    rs.getObject("arrivalDate", LocalDate.class),
-                    rs.getObject("departureDate", LocalDate.class));
+                    rs.getDate("arrivalDate"),
+                    rs.getDate("departureDate"));
 
 
     @Override
@@ -109,27 +109,44 @@ public class BookingManagerImpl implements BookingManager {
                 .addValue("price",booking.getPrice())
                 .addValue("roomId", booking.getRoom().getId())
                 .addValue("guestId", booking.getGuest().getId())
-                .addValue("arrivalDate", toSQLDate(booking.getArrivalDate()))
-                .addValue("departureDate", toSQLDate(booking.getDepartureDate()));
+                .addValue("arrivalDate", (booking.getArrivalDate()))
+                .addValue("departureDate", (booking.getDepartureDate()));
         Number id = insertLease.executeAndReturnKey(parameters);
         booking.setId(id.longValue());
+        validate(booking);
     }
 
     @Override
     public void updateBooking(Booking booking) {
+        validate(booking);
         jdbc.update("UPDATE bookings set price=?,roomId=?,guestId=?, arrivalDate=?, departureDate=? where id=?",
                 booking.getPrice(), booking.getRoom().getId(), booking.getGuest().getId(),booking.getArrivalDate(),
                 booking.getDepartureDate(),booking.getId());
+        validate(booking);
     }
 
     @Override
     public void deleteBooking(Booking booking) {
+        validate(booking);
+
         jdbc.update("DELETE FROM bookings WHERE id=?", booking.getId());
     }
 
     private Date toSQLDate(LocalDate localDate) {
         if (localDate == null) return null;
         return new Date(ZonedDateTime.of(localDate.atStartOfDay(), ZoneId.systemDefault()).toInstant().toEpochMilli());
+    }
+
+    private void validate(Booking booking){
+        if (booking.getArrivalDate().after(booking.getDepartureDate())){
+            throw new ValidationException("Departure after arrival");
+        }
+        if (booking.getPrice()<=0){
+            throw new ValidationException("Incorrect price");
+        }if (booking.getGuest()==null || booking.getRoom()==null
+                || booking.getArrivalDate()==null || booking.getDepartureDate()==null ){
+            throw new IllegalArgumentException("Parameter is null");
+        }
     }
 
 }

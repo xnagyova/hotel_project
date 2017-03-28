@@ -1,8 +1,6 @@
 package cz.muni.fi.hotel;
 
-import cz.muni.fi.hotel.common.DBUtils;
-import cz.muni.fi.hotel.common.ServiceFailureException;
-import org.junit.After;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,10 +9,12 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import javax.sql.DataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,39 +36,12 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 @RunWith(SpringJUnit4ClassRunner.class) //Spring se zúčastní unit testů
 @ContextConfiguration(classes = {MySpringTestConfig.class}) //konfigurace je ve třídě MySpringTestConfig
 public class RoomManagerImplTest {
-    private EmbeddedDatabase db;
+    private JdbcTemplate jdbc;
 
     @Autowired
     private RoomManager roomManager;
     private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
-    /*@Before
-    public void setUp() throws Exception {
-        db = new EmbeddedDatabaseBuilder().setType(DERBY).addScript("schema-javadb.sql").addScript("my-test-data.sql").build();
-        roomManager = new RoomManagerImpl(db);
-    }
 
-    @After
-    public void tearDown() throws Exception {
-        db.shutdown();
-    }*/
-    /*
-
-    private RoomManagerImpl roomManager;
-    private DataSource ds;
-
-    @Before
-    public void setUp() throws SQLException {
-        ds = prepareDataSource();
-        DBUtils.executeSqlScript(ds,RoomManager.class.getResource("schema-javadb.sql"));
-        roomManager = new RoomManagerImpl();
-        roomManager.setDataSource(ds);
-    }
-
-    @After
-    public void tearDown() throws SQLException {
-        // Drop tables after each test
-        DBUtils.executeSqlScript(ds,RoomManager.class.getResource("schema-psql.sql"));
-    }*/
 
     @Rule
     // attribute annotated with @Rule annotation must be public :-(
@@ -126,7 +99,7 @@ public class RoomManagerImplTest {
     public void buildRoomOnNegativeFloor() {
         Room room = sampleBigRoomBuilder().floorNumber(-1).build();
         assertThatThrownBy(() -> roomManager.buildRoom(room))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(cz.muni.fi.hotel.common.ValidationException.class);
     }
 
     @Test
@@ -142,7 +115,7 @@ public class RoomManagerImplTest {
     public void buildRoomWithNegativeCapacity() {
         Room room = sampleBigRoomBuilder().capacity(-1).build();
         assertThatThrownBy(() -> roomManager.buildRoom(room))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(cz.muni.fi.hotel.common.ValidationException.class);
     }
 
 
@@ -151,7 +124,7 @@ public class RoomManagerImplTest {
     public void buildRoomWithZeroCapacity() {
         Room room = sampleBigRoomBuilder().capacity(0).build();
         assertThatThrownBy(() -> roomManager.buildRoom(room))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(cz.muni.fi.hotel.common.ValidationException.class);
     }
 
     @FunctionalInterface
@@ -177,12 +150,20 @@ public class RoomManagerImplTest {
 
     @Test
     public void updateRoomFloorNumber() {
-        testUpdateRoomInformation((room) -> room.setFloorNumber(4));
+        testUpdateRoomInformation((room) -> {
+                room.setFloorNumber(4);
+
+        });
     }
 
     @Test
     public void updateRoomCapacity() {
-        testUpdateRoomInformation((room) -> room.setCapacity(4));
+        testUpdateRoomInformation((room) -> {
+                room.setCapacity(4);
+
+
+
+        });
     }
 
     @Test
@@ -190,7 +171,7 @@ public class RoomManagerImplTest {
         testUpdateRoomInformation((room) -> room.setBalcony(false));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void updateNullRoom() {
         roomManager.updateRoomInformation(null);
     }
@@ -198,31 +179,31 @@ public class RoomManagerImplTest {
 
 
     @Test
-    public void updateRoomOnNegativeFloor() {
+    public void updateRoomOnNegativeFloor()  {
         Room room = sampleBigRoomBuilder().build();
         roomManager.buildRoom(room);
         room.setFloorNumber(-1);
-        expectedException.expect(ValidationException.class);
+        expectedException.expect(cz.muni.fi.hotel.common.ValidationException.class);
         roomManager.updateRoomInformation(room);
     }
 
 
     @Test
-    public void updateRoomWithZeroCapacity() {
+    public void updateRoomWithZeroCapacity()  {
         Room room = sampleBigRoomBuilder().build();
         roomManager.buildRoom(room);
         room.setCapacity(0);
-        expectedException.expect(ValidationException.class);
+        expectedException.expect(cz.muni.fi.hotel.common.ValidationException.class);
         roomManager.updateRoomInformation(room);
     }
 
 
     @Test
-    public void updateRoomWithNegativeCapacity() {
+    public void updateRoomWithNegativeCapacity()  {
         Room room = sampleBigRoomBuilder().build();
         roomManager.buildRoom(room);
         room.setCapacity(-1);
-        expectedException.expect(ValidationException.class);
+        expectedException.expect(cz.muni.fi.hotel.common.ValidationException.class);
         roomManager.updateRoomInformation(room);
     }
 
@@ -236,7 +217,7 @@ public class RoomManagerImplTest {
         assertThat(roomManager.findRoomById(r1.getId())).isNotNull();
         assertThat(roomManager.findRoomById(r2.getId())).isNotNull();
 
-        roomManager.deleteRoom(r1.getId());
+        roomManager.deleteRoom(r1);
 
         assertThat(roomManager.findRoomById(r1.getId())).isNull();
         assertThat(roomManager.findRoomById(r2.getId())).isNotNull();
@@ -283,10 +264,11 @@ public class RoomManagerImplTest {
         assertThat(roomManager.findRoomById(bigRoomId))
                 .isEqualToComparingFieldByField(bigRoom);
     }
+    @Before
 
     @Test
     public void listAllRooms() {
-        assertThat(roomManager.listAllRooms()).isEmpty();
+
 
         Room r1 = sampleBigRoomBuilder().build();
         Room r2 = sampleSmallRoomBuilder().build();
@@ -294,83 +276,14 @@ public class RoomManagerImplTest {
         roomManager.buildRoom(r1);
         roomManager.buildRoom(r2);
 
+
         assertThat(roomManager.listAllRooms())
                 .usingFieldByFieldElementComparator()
-                .containsOnly(r1,r2);
+                .contains(r1,r2);
+
 
     }
-    /*
 
-    @Test
-    public void buildRoomWithSqlExceptionThrown() throws SQLException {
-        // Create sqlException, which will be thrown by our DataSource mock
-        // object to simulate DB operation failure
-        SQLException sqlException = new SQLException();
-        // Create DataSource mock object
-        DataSource failingDataSource = mock(DataSource.class);
-        // Instruct our DataSource mock object to throw our sqlException when
-        // DataSource.getConnection() method is called.
-        when(failingDataSource.getConnection()).thenThrow(sqlException);
-        // Configure our manager to use DataSource mock object
-        roomManager.setDataSource(failingDataSource);
-
-        // Create Room instance for our test
-        Room room = sampleSmallRoomBuilder().build();
-
-        // Try to call roomManager.buildRoom(Room) method and expect that
-        // exception will be thrown
-        assertThatThrownBy(() -> roomManager.buildRoom(room))
-                // Check that thrown exception is ServiceFailureException
-                .isInstanceOf(ServiceFailureException.class)
-                // Check if cause is properly set
-                .hasCause(sqlException);
-    }
-
-    // Now we want to test also other methods of GraveManager. To avoid having
-    // couple of method with lots of duplicit code, we will use the similar
-    // approach as with testUpdateGrave(Operation) method.
-
-    private void testExpectedServiceFailureException(Operation<RoomManager> operation) throws SQLException {
-        SQLException sqlException = new SQLException();
-        DataSource failingDataSource = mock(DataSource.class);
-        when(failingDataSource.getConnection()).thenThrow(sqlException);
-        roomManager.setDataSource(failingDataSource);
-        assertThatThrownBy(() -> operation.callOn(roomManager))
-                .isInstanceOf(ServiceFailureException.class)
-                .hasCause(sqlException);
-    }
-
-    @Test
-    public void updateRoomInformationsWithSqlExceptionThrown() throws SQLException {
-        Room room = sampleSmallRoomBuilder().build();
-        roomManager.buildRoom(room);
-        testExpectedServiceFailureException((roomManager) -> roomManager.updateRoomInformation(room));
-    }
-
-    @Test
-    public void findRoomByIdWithSqlExceptionThrown() throws SQLException {
-        Room room = sampleSmallRoomBuilder().build();
-        roomManager.buildRoom(room);
-        testExpectedServiceFailureException((roomManager) -> roomManager.findRoomById(room.getId()));
-    }
-
-    @Test
-    public void deleteRoomWithSqlExceptionThrown() throws SQLException {
-        Room room = sampleSmallRoomBuilder().build();
-        roomManager.buildRoom(room);
-        testExpectedServiceFailureException((roomManager) -> roomManager.deleteRoom(room));
-    }
-
-    @Test
-    public void findAllRoomWithSqlExceptionThrown() throws SQLException {
-        testExpectedServiceFailureException(RoomManager::listAllRooms);
-    }
-
-    @Test
-    public void findFreeRoomsWithSqlExceptionThrown() throws SQLException {
-        testExpectedServiceFailureException(RoomManager::findFreeRooms);
-    }
-    */
 
 
 }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -37,7 +38,7 @@ public class Main {
 
         roomManager.listAllRooms().forEach(System.out::println);
 
-        Guest guest = new Guest(null, "Jan Novák", LocalDate.of (1986,05,4), "602123456");
+        Guest guest = new Guest(null, "Jan Novák", new Date(1986,05,4), "602123456");
         guestManager.createGuest(guest);
 
 

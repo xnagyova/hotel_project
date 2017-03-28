@@ -1,5 +1,7 @@
 package cz.muni.fi.hotel;
 
+import javax.xml.bind.ValidationException;
+
 /**
  * @author kkatanik & nagyova
  */
@@ -32,15 +34,18 @@ public class Room {
         return floorNumber;
     }
 
-    public void setFloorNumber(int floorNumber) {
+    public void setFloorNumber(int floorNumber){
+
         this.floorNumber = floorNumber;
     }
 
     public int getCapacity() {
+
         return capacity;
     }
 
-    public void setCapacity(int capacity) {
+    public void setCapacity(int capacity){
+
         this.capacity = capacity;
     }
 

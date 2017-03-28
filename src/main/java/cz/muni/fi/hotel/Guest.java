@@ -12,13 +12,13 @@ public class Guest  {
 
     private Long id;
     private String name;
-    private LocalDate dateOfBirth;
+    private Date dateOfBirth;
     private String phoneNumber;
 
     public Guest() {
     }
 
-    public Guest(Long id, String name, LocalDate dateOfBirth, String phoneNumber) {
+    public Guest(Long id, String name,Date dateOfBirth, String phoneNumber) {
         this.id = id;
         this.name = name;
         this.dateOfBirth = dateOfBirth;
@@ -42,11 +42,11 @@ public class Guest  {
         this.name = name;
     }
 
-    public LocalDate getDateOfBirth() {
+    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

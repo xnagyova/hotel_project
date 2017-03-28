@@ -4,12 +4,15 @@ import cz.muni.fi.hotel.common.DBUtils;
 import cz.muni.fi.hotel.common.IllegalEntityException;
 import cz.muni.fi.hotel.common.ServiceFailureException;
 
+
+import cz.muni.fi.hotel.common.ValidationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import sun.security.validator.ValidatorException;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -30,15 +33,19 @@ public class RoomManagerImpl implements RoomManager{
         this.jdbc = new JdbcTemplate(dataSource);
     }
 
+
     @Override
-    public void deleteRoom(Long id) {
-        jdbc.update("DELETE FROM rooms WHERE id=?", id);
+    public void deleteRoom(Room room) {
+        validate(room);
+        jdbc.update("DELETE FROM rooms WHERE id=?", room.getId());
     }
 
     @Override
     public void updateRoomInformation(Room room) {
+        validate(room);
         jdbc.update("UPDATE rooms set floorNumber=?,capacity=?,balcony=? where id=?",
                 room.getFloorNumber(), room.getCapacity(), room.isBalcony()?1:0,room.getId());
+        validate(room);
     }
 
     private RowMapper<Room> roomMapper = (rs, rowNum) ->
@@ -63,8 +70,10 @@ public class RoomManagerImpl implements RoomManager{
 
     @Override
     public void buildRoom(Room room) {
+        validate(room);
         SimpleJdbcInsert insertRoom = new SimpleJdbcInsert(jdbc)
                 .withTableName("rooms").usingGeneratedKeyColumns("id");
+
 
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("floorNumber", room.getFloorNumber())
@@ -73,6 +82,20 @@ public class RoomManagerImpl implements RoomManager{
 
         Number id = insertRoom.executeAndReturnKey(parameters);
         room.setId(id.longValue());
+        validate(room);
     }
+
+    private static void validate(Room room){
+        if (room==null){
+            throw new IllegalArgumentException("room is null");
+        }
+        if (room.getCapacity()<=0){
+            throw new ValidationException("capacity must be positive");
+        }
+        if (room.getFloorNumber()<0){
+            throw new ValidationException("floor number cannot be negative");
+        }
+    }
+
 
 }

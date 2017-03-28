@@ -1,9 +1,9 @@
 package cz.muni.fi.hotel.common;
 
 /**
- *@author kkatanik & snagyova
+ * Created by User on 28.3.2017.
  */
-public class ValidationException extends RuntimeException {
+public class ValidationException extends RuntimeException{
 
     /**
      * Creates a new instance of
@@ -21,5 +21,4 @@ public class ValidationException extends RuntimeException {
     public ValidationException(String msg) {
         super(msg);
     }
-
 }

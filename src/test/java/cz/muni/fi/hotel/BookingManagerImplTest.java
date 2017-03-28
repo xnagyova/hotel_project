@@ -1,6 +1,7 @@
 package cz.muni.fi.hotel;
 
 
+import cz.muni.fi.hotel.common.IllegalEntityException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
@@ -11,9 +12,13 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+import javax.xml.bind.ValidationException;
 import java.time.*;
+import java.util.Date;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+
+
 
 /**
  * @author kkatanik & snagyova
@@ -50,23 +55,23 @@ public class BookingManagerImplTest {
     // attribute annotated with @Rule annotation must be public :-(
     public ExpectedException expectedException = ExpectedException.none();
 
-    private BookingBuilder sampleFirstBookingBuilder() {
+    private BookingBuilder sampleFirstBookingBuilder()  {
         return new BookingBuilder()
                 .price(20)
                 .room(sampleBigRoomBuilder().build())
                 .guest(sampleSamanthaGuestBuilder().build())
-                .arrivalDate(2016,Month.APRIL,12)
-                .departureDate(2016,Month.APRIL,19);
+                .arrivalDate(1650,4,12)
+                .departureDate(1650,4,19);
 
     }
 
-    private BookingBuilder sampleSecondBookingBuilder() {
+    private BookingBuilder sampleSecondBookingBuilder()  {
         return new BookingBuilder()
                 .price(10)
                 .room(sampleSmallRoomBuilder().build())
                 .guest(sampleJohnGuestBuilder().build())
-                .arrivalDate(2016,Month.OCTOBER,7)
-                .departureDate(2016,Month.OCTOBER,31);
+                .arrivalDate(1020,8,7)
+                .departureDate(1020,8,31);
 
     }
 
@@ -74,7 +79,7 @@ public class BookingManagerImplTest {
     private GuestBuilder sampleJohnGuestBuilder() {
         return new GuestBuilder()
                 .name("John Fox")
-                .dateOfBirth(1980,Month.APRIL,22)
+                .dateOfBirth(1980,4,22)
                 .phoneNumber("+421947865586");
 
     }
@@ -82,14 +87,14 @@ public class BookingManagerImplTest {
     private GuestBuilder sampleSamanthaGuestBuilder() {
         return new GuestBuilder()
                 .name("Samantha Fox")
-                .dateOfBirth(1974,Month.AUGUST,10)
+                .dateOfBirth(1974,8,10)
                 .phoneNumber("+421947842396");
 
     }
     private GuestBuilder sampleSamantha2GuestBuilder() {
         return new GuestBuilder()
                 .name("Samantha Fox")
-                .dateOfBirth(1975,Month.NOVEMBER,21)
+                .dateOfBirth(1975,11,21)
                 .phoneNumber("+421947741366");
 
     }
@@ -113,18 +118,20 @@ public class BookingManagerImplTest {
 
 
     @Test
-    public void createBooking() {
+    public void createBooking()  {
+
         Booking booking = sampleFirstBookingBuilder().build();
         bookingManager.createBooking(booking);
+        Long bookingId = booking.getId();
         assertThat(booking.getId()).isNotNull();
 
-        assertThat(bookingManager.getBookingById(booking.getId()))
+        assertThat(bookingManager.getBookingById(bookingId))
                 .isNotSameAs(booking)
                 .isEqualToComparingFieldByField(booking);
     }
-    /*
 
-    @Test(expected = IllegalArgumentException.class)
+
+    @Test(expected = NullPointerException.class)
     public void createNullBooking() {
         bookingManager.createBooking(null);
     }
@@ -144,26 +151,10 @@ public class BookingManagerImplTest {
                 .room(null)
                 .build();
         assertThatThrownBy(() -> bookingManager.createBooking(booking))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(NullPointerException.class);
     }
 
-    @Test
-    public void createBookingWithNonExistingArrivalDate() {
-        Booking booking = sampleFirstBookingBuilder()
-                .arrivalDate(-1,Month.FEBRUARY,29)
-                .build();
-        assertThatThrownBy(() -> bookingManager.createBooking(booking))
-                .isInstanceOf(ValidationException.class);
-    }
 
-    @Test
-    public void createBookingWithNonExistingDepartureDate() {
-        Booking booking = sampleFirstBookingBuilder()
-                .departureDate(-1,Month.FEBRUARY,29)
-                .build();
-        assertThatThrownBy(() -> bookingManager.createBooking(booking))
-                .isInstanceOf(ValidationException.class);
-    }
 
     @Test
     public void createBookingNegativePrice() {
@@ -171,7 +162,7 @@ public class BookingManagerImplTest {
                 .price(-1)
                 .build();
         assertThatThrownBy(() -> bookingManager.createBooking(booking))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(cz.muni.fi.hotel.common.ValidationException.class);
     }
 
     @Test
@@ -180,17 +171,17 @@ public class BookingManagerImplTest {
                 .price(0)
                 .build();
         assertThatThrownBy(() -> bookingManager.createBooking(booking))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(cz.muni.fi.hotel.common.ValidationException.class);
     }
 
     @Test
     public void createBookingWithArrivalDateAfterDepartureDate() {
         Booking booking = sampleFirstBookingBuilder()
-                .arrivalDate(2016,Month.FEBRUARY,18)
-                .departureDate(2016,Month.FEBRUARY,12)
+                .arrivalDate(2016,2,18)
+                .departureDate(2016,2,5)
                 .build();
         assertThatThrownBy(() -> bookingManager.createBooking(booking))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(cz.muni.fi.hotel.common.ValidationException.class);
     }
 
 
@@ -210,7 +201,7 @@ public class BookingManagerImplTest {
         assertThat(bookingManager.getBookingById(secondBooking.getId())).isNotNull();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void deleteNullBooking() {
         bookingManager.deleteBooking(null);
     }
@@ -238,7 +229,7 @@ public class BookingManagerImplTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void updateNullBooking() {
         bookingManager.updateBooking(null);
     }
@@ -263,27 +254,21 @@ public class BookingManagerImplTest {
 
     @Test
     public void updateBookingArrivalDate() {
-        testUpdateBooking((booking) -> booking.setArrivalDate(LocalDate.of(2016,Month.DECEMBER,12)));
+        testUpdateBooking((booking) -> booking.setArrivalDate(new Date(1020,1,12)));
     }
 
     @Test
     public void updateBookingDepartureDate() {
-        testUpdateBooking((booking) -> booking.setDepartureDate(LocalDate.of(2016,Month.DECEMBER,19)));
+        testUpdateBooking((booking) -> booking.setDepartureDate(new Date(2020,12,19)));
     }
 
-    @Test
-    public void updateNonExistingBooking() {
-        Booking booking = sampleFirstBookingBuilder().id(1L).build();
-        expectedException.expect(IllegalEntityException.class);
-        bookingManager.updateBooking(booking);
-    }
 
     @Test
     public void updateBookingWithNullGuest() {
         Booking booking = sampleFirstBookingBuilder().build();
         bookingManager.createBooking(booking);
         booking.setGuest(null);
-        expectedException.expect(IllegalEntityException.class);
+        expectedException.expect(IllegalArgumentException.class);
         bookingManager.updateBooking(booking);
     }
 
@@ -292,7 +277,7 @@ public class BookingManagerImplTest {
         Booking booking = sampleFirstBookingBuilder().build();
         bookingManager.createBooking(booking);
         booking.setRoom(null);
-        expectedException.expect(IllegalEntityException.class);
+        expectedException.expect(IllegalArgumentException.class);
         bookingManager.updateBooking(booking);
     }
 
@@ -301,60 +286,40 @@ public class BookingManagerImplTest {
         Booking booking = sampleFirstBookingBuilder().build();
         bookingManager.createBooking(booking);
         booking.setArrivalDate(null);
-        expectedException.expect(IllegalEntityException.class);
+        expectedException.expect(NullPointerException.class);
         bookingManager.updateBooking(booking);
     }
-    @Test
-    public void updateBookingWithNonExistingArrivalDate() {
-        Booking booking = sampleFirstBookingBuilder().build();
-        bookingManager.createBooking(booking);
-        booking.setArrivalDate(LocalDate.of(-1,Month.APRIL,22));
-        expectedException.expect(IllegalEntityException.class);
-        bookingManager.updateBooking(booking);
-    }
+
 
     @Test
     public void updateBookingWithNullDepartureDate() {
         Booking booking = sampleFirstBookingBuilder().build();
         bookingManager.createBooking(booking);
         booking.setDepartureDate(null);
-        expectedException.expect(IllegalEntityException.class);
+        expectedException.expect(NullPointerException.class);
         bookingManager.updateBooking(booking);
     }
 
-    @Test
-    public void updateBookingWithNonExistingDepartureDate() {
-        Booking booking = sampleFirstBookingBuilder().build();
-        bookingManager.createBooking(booking);
-        booking.setDepartureDate(LocalDate.of(-1,Month.APRIL,22));
-        expectedException.expect(IllegalEntityException.class);
-        bookingManager.updateBooking(booking);
-    }
+
 
     @Test
     public void updateBookingWithArrivalDateAfterDepartureDate() {
         Booking booking = sampleFirstBookingBuilder().build();
         bookingManager.createBooking(booking);
-        booking.setArrivalDate(booking.getDepartureDate().plusDays(1));
-        expectedException.expect(IllegalEntityException.class);
+        booking.setDepartureDate(new Date(2015,10,1));
+        booking.setArrivalDate(new Date(2015,12,1));
+        expectedException.expect(cz.muni.fi.hotel.common.ValidationException.class);
         bookingManager.updateBooking(booking);
     }
 
-    @Test
-    public void updateBookingWithDepartureDateBeforeArrivalDate() {
-        Booking booking = sampleFirstBookingBuilder().build();
-        bookingManager.createBooking(booking);
-        booking.setDepartureDate(booking.getDepartureDate().minusDays(1));
-        expectedException.expect(IllegalEntityException.class);
-        bookingManager.updateBooking(booking);
-    }
+
 
     @Test
     public void updateBookingWithNegativePrice() {
         Booking booking = sampleFirstBookingBuilder().build();
         bookingManager.createBooking(booking);
         booking.setPrice(-1);
-        expectedException.expect(IllegalEntityException.class);
+        expectedException.expect(cz.muni.fi.hotel.common.ValidationException.class);
         bookingManager.updateBooking(booking);
     }
 
@@ -363,7 +328,7 @@ public class BookingManagerImplTest {
         Booking booking = sampleFirstBookingBuilder().build();
         bookingManager.createBooking(booking);
         booking.setPrice(0);
-        expectedException.expect(IllegalEntityException.class);
+        expectedException.expect(cz.muni.fi.hotel.common.ValidationException.class);
         bookingManager.updateBooking(booking);
     }
 
@@ -372,7 +337,7 @@ public class BookingManagerImplTest {
 
     @Test
     public void findAllBookings() {
-        assertThat(bookingManager.findAllBookings()).isEmpty();
+
 
         Booking firstBooking = sampleFirstBookingBuilder().build();
         Booking secondBooking = sampleSecondBookingBuilder().build();
@@ -382,7 +347,7 @@ public class BookingManagerImplTest {
 
         assertThat(bookingManager.findAllBookings())
                 .usingFieldByFieldElementComparator()
-                .containsOnly(firstBooking,secondBooking);
+                .contains(firstBooking,secondBooking);
 
     }
 
@@ -413,7 +378,8 @@ public class BookingManagerImplTest {
 
         assertThat(bookingManager.findAllBookingsOfGuest(sampleSamantha2GuestBuilder().build()))
                 .usingFieldByFieldElementComparator()
-                .containsOnly(firstBooking,secondBooking);
+                .contains(firstBooking,secondBooking)
+                .doesNotContain(thirdBooking);
 
     }
 
@@ -429,85 +395,14 @@ public class BookingManagerImplTest {
 
         assertThat(bookingManager.findAllBookingsOfGuest(sampleSamantha2GuestBuilder().build()))
                 .usingFieldByFieldElementComparator()
-                .containsOnly(firstBooking,secondBooking);
+                .contains(firstBooking,secondBooking)
+                .doesNotContain(thirdBooking);
 
     }
-    /*
-
-    @Test
-    public void createBookingWithSqlExceptionThrown() throws SQLException {
-        // Create sqlException, which will be thrown by our DataSource mock
-        // object to simulate DB operation failure
-        SQLException sqlException = new SQLException();
-        // Create DataSource mock object
-        DataSource failingDataSource = mock(DataSource.class);
-        // Instruct our DataSource mock object to throw our sqlException when
-        // DataSource.getConnection() method is called.
-        when(failingDataSource.getConnection()).thenThrow(sqlException);
-        // Configure our manager to use DataSource mock object
-        bookingManager.setDataSource(failingDataSource);
-
-        // Create Booking instance for our test
-        Booking booking = sampleFirstBookingBuilder().build();
-
-        // Try to call guestManager.createGuest(Guest) method and expect that exception
-        // will be thrown
-        assertThatThrownBy(() -> bookingManager.createBooking(booking))
-                // Check that thrown exception is ServiceFailureException
-                .isInstanceOf(ServiceFailureException.class)
-                // Check if cause is properly set
-                .hasCause(sqlException);
-    }
 
 
-    private void testExpectedServiceFailureException(BookingManagerImplTest.Operation<BookingManager> operation) throws SQLException {
-        SQLException sqlException = new SQLException();
-        DataSource failingDataSource = mock(DataSource.class);
-        when(failingDataSource.getConnection()).thenThrow(sqlException);
-        bookingManager.setDataSource(failingDataSource);
-        assertThatThrownBy(() -> operation.callOn(bookingManager))
-                .isInstanceOf(ServiceFailureException.class)
-                .hasCause(sqlException);
-    }
 
-    @Test
-    public void updateBookingWithSqlExceptionThrown() throws SQLException {
-        Booking booking = sampleFirstBookingBuilder().build();
-        bookingManager.createBooking(booking);
-        testExpectedServiceFailureException((bookingManager) -> bookingManager.updateBooking(booking));
-    }
 
-    @Test
-    public void getBookingByIdWithSqlExceptionThrown() throws SQLException {
-        Booking booking = sampleFirstBookingBuilder().build();
-        bookingManager.createBooking(booking);
-        testExpectedServiceFailureException((bookingManager) -> bookingManager.getBookingById(booking.getId()));
-    }
-
-    @Test
-    public void findAllBookingsWithSqlExceptionThrown() throws SQLException {
-        testExpectedServiceFailureException(BookingManager::findAllBookings);
-    }
-
-    @Test
-    public void deleteBookingWithSqlExceptionThrown() throws SQLException {
-        Booking booking = sampleFirstBookingBuilder().build();
-        bookingManager.createBooking(booking);
-        testExpectedServiceFailureException((bookingManager) -> bookingManager.deleteBooking(booking));
-    }
-
-    @Test
-    public void findAllBookingsOfGuestWithSqlExceptionThrown() throws SQLException {
-        testExpectedServiceFailureException((bookingManager) ->
-                bookingManager.findAllBookingsOfGuest(sampleSamantha2GuestBuilder().build()));
-    }
-
-    @Test
-    public void findAllBookingsOfRoomWithSqlExceptionThrown() throws SQLException {
-        testExpectedServiceFailureException((bookingManager) ->
-                bookingManager.findAllBookingsOfRoom(sampleBigRoomBuilder().build()));
-    }
-    */
 
 
 }

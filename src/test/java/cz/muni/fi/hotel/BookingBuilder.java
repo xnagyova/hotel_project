@@ -2,6 +2,7 @@ package cz.muni.fi.hotel;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Date;
 
 /**
  * @author kkatanik & snagyova
@@ -11,8 +12,8 @@ public class BookingBuilder {
     private int price;
     private Room room;
     private Guest guest;
-    private LocalDate arrivalDate;
-    private LocalDate departureDate;
+    private Date arrivalDate;
+    private Date departureDate;
 
     public BookingBuilder id(Long id){
         this.id = id;
@@ -34,13 +35,13 @@ public class BookingBuilder {
         return this;
     }
 
-    public BookingBuilder arrivalDate(int year, Month month, int day) {
-        this.arrivalDate = LocalDate.of(year, month, day);
+    public BookingBuilder arrivalDate(int year, int month, int day) {
+        this.arrivalDate = new Date(year, month, day);
         return this;
     }
 
-    public BookingBuilder departureDate(int year, Month month, int day) {
-        this.departureDate = LocalDate.of(year, month, day);
+    public BookingBuilder departureDate(int year,int month, int day) {
+        this.departureDate = new Date(year, month, day);
         return this;
     }
 
