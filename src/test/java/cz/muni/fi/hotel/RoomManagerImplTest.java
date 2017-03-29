@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 import org.apache.derby.jdbc.EmbeddedDataSource;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -209,18 +210,15 @@ public class RoomManagerImplTest {
 
     @Test
     public void deleteRoom()  {
-        Room r1 = sampleBigRoomBuilder().build();
-        Room r2 = sampleSmallRoomBuilder().build();
-        roomManager.buildRoom(r1);
-        roomManager.buildRoom(r2);
+        System.out.println(roomManager.listAllRooms());
+        roomManager.deleteRoom(roomManager.findRoomById(1L));
+        try {
+            roomManager.findRoomById(1L);
+            fail("room 1 not deleted");
+        } catch (EmptyResultDataAccessException e) {
 
-        assertThat(roomManager.findRoomById(r1.getId())).isNotNull();
-        assertThat(roomManager.findRoomById(r2.getId())).isNotNull();
+            }
 
-        roomManager.deleteRoom(r1);
-
-        assertThat(roomManager.findRoomById(r1.getId())).isNull();
-        assertThat(roomManager.findRoomById(r2.getId())).isNotNull();
     }
 
     @Test(expected = IllegalArgumentException.class)

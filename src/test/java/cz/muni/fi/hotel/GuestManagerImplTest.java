@@ -10,6 +10,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -142,18 +143,14 @@ public class GuestManagerImplTest {
     @Test
     public void deleteGuest() {
 
-        Guest john = sampleJohnGuestBuilder().build();
-        Guest samantha = sampleSamanthaGuestBuilder().build();
+        guestManager.deleteGuest(guestManager.findGuestById(1L));
+        try {
+            guestManager.findGuestById(1L);
+            fail("guest 1 not deleted");
+        } catch (EmptyResultDataAccessException e) {
+            //no code
+        }
 
-        guestManager.createGuest(john);
-        guestManager.createGuest(samantha);
-
-        assertThat(guestManager.findGuestById(john.getId())).isNotNull();
-        assertThat(guestManager.findGuestById(samantha.getId())).isNotNull();
-
-        guestManager.deleteGuest(john);
-        assertThat(guestManager.findGuestById(john.getId())).isNull();
-        assertThat(guestManager.findGuestById(samantha.getId())).isNotNull();
 
     }
 

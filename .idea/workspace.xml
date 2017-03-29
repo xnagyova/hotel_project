@@ -2,22 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fc3dca1f-f126-4f36-9264-ca6b96e8ea9c" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Booking.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Booking.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManagerImpl.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManagerImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Guest.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Guest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManager.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManagerImpl.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManagerImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Main.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Room.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Room.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/RoomManager.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/RoomManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/RoomManagerImpl.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/RoomManagerImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/common/ValidationException.java" afterPath="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/common/ValidationException.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/BookingBuilder.java" afterPath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/BookingBuilder.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/BookingManagerImplTest.java" afterPath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/BookingManagerImplTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestBuilder.java" afterPath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestBuilder.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestManagerImplTest.java" afterPath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestManagerImplTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/RoomBuilder.java" afterPath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/RoomBuilder.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/RoomManagerImplTest.java" afterPath="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/RoomManagerImplTest.java" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
@@ -91,52 +79,8 @@
       <file leaf-file-name="BookingManager.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="25" column="58" lean-forward="false" selection-start-line="25" selection-start-column="58" selection-end-line="25" selection-end-column="58" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RoomManagerImpl.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/RoomManagerImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="34" column="0" lean-forward="false" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <marker date="1490740510658" expanded="true" signature="1174:1202" ph="DELETE FROM " />
-                <marker date="1490740510658" expanded="true" signature="1337:1399" ph="UPDATE rooms... " />
-                <marker date="1490740510658" expanded="true" signature="1801:1820" ph="SELECT * FRO... rooms" />
-                <marker date="1490740510658" expanded="true" signature="1924:1962" ph="SELECT * FRO... rooms" />
-                <marker date="1490740510658" expanded="true" signature="2075:2105" ph="SELECT * FRO... rooms" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BookingManagerImpl.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManagerImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="675">
-              <caret line="105" column="48" lean-forward="false" selection-start-line="105" selection-start-column="48" selection-end-line="105" selection-end-column="48" />
-              <folding>
-                <marker date="1490743915392" expanded="true" signature="1398:1436" ph="SELECT * FRO... bookings" />
-                <marker date="1490743915392" expanded="true" signature="2241:2278" ph="SELECT * FRO... bookings" />
-                <marker date="1490743915392" expanded="true" signature="3070:3092" ph="SELECT * FRO... bookings" />
-                <marker date="1490743915392" expanded="true" signature="3214:3247" ph="SELECT * FRO... bookings" />
-                <marker date="1490743915392" expanded="true" signature="4469:4558" ph="UPDATE booki... " />
-                <marker date="1490743915392" expanded="true" signature="4884:4915" ph="DELETE FROM " />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BookingBuilder.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/BookingBuilder.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4">
-              <caret line="34" column="20" lean-forward="true" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
+            <state relative-caret-position="123">
+              <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -145,9 +89,29 @@
       <file leaf-file-name="Booking.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Booking.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-214">
+            <state relative-caret-position="643">
               <caret line="73" column="33" lean-forward="true" selection-start-line="73" selection-start-column="33" selection-end-line="73" selection-end-column="33" />
-              <folding />
+              <folding>
+                <element signature="e#1420#1421#0" expanded="true" />
+                <element signature="e#1470#1471#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BookingManagerImpl.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManagerImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-193">
+              <caret line="55" column="96" lean-forward="false" selection-start-line="55" selection-start-column="96" selection-end-line="55" selection-end-column="96" />
+              <folding>
+                <marker date="1490749475629" expanded="true" signature="1398:1436" ph="SELECT * FRO... bookings" />
+                <marker date="1490749475629" expanded="true" signature="1585:1622" ph="SELECT * FRO... bookings" />
+                <marker date="1490749475629" expanded="true" signature="1748:1770" ph="SELECT * FRO... bookings" />
+                <marker date="1490749475629" expanded="true" signature="1892:1925" ph="SELECT * FRO... bookings" />
+                <marker date="1490749475629" expanded="true" signature="3147:3236" ph="UPDATE booki... " />
+                <marker date="1490749475629" expanded="true" signature="3562:3593" ph="DELETE FROM " />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -155,25 +119,23 @@
       <file leaf-file-name="GuestManagerImplTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestManagerImplTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="124">
-              <caret line="75" column="8" lean-forward="true" selection-start-line="75" selection-start-column="8" selection-end-line="83" selection-end-column="55" />
+            <state relative-caret-position="-159">
+              <caret line="172" column="36" lean-forward="true" selection-start-line="172" selection-start-column="36" selection-end-line="172" selection-end-column="36" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2368#2369#0" expanded="true" />
-                <element signature="e#2414#2415#0" expanded="true" />
+                <element signature="e#2431#2432#0" expanded="true" />
+                <element signature="e#2477#2478#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Main.java">
+      <file leaf-file-name="GuestBuilder.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestBuilder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="680">
-              <caret line="40" column="58" lean-forward="false" selection-start-line="40" selection-start-column="58" selection-end-line="40" selection-end-column="58" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="15">
+              <caret line="27" column="52" lean-forward="false" selection-start-line="27" selection-start-column="52" selection-end-line="27" selection-end-column="52" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -181,16 +143,16 @@
       <file leaf-file-name="BookingManagerImplTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/BookingManagerImplTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="310" column="76" lean-forward="false" selection-start-line="310" selection-start-column="76" selection-end-line="310" selection-end-column="76" />
+            <state relative-caret-position="178">
+              <caret line="358" column="0" lean-forward="false" selection-start-line="358" selection-start-column="0" selection-end-line="358" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <marker date="1490744726561" expanded="true" signature="3786:3797" ph=" { " />
-                <marker date="1490744726561" expanded="true" signature="3832:3838" ph=" }" />
-                <marker date="1490744726561" expanded="true" signature="6264:6275" ph=" { " />
-                <marker date="1490744726561" expanded="true" signature="6310:6316" ph=" }" />
-                <marker date="1490744726561" expanded="true" signature="7253:7264" ph=" { " />
-                <marker date="1490744726561" expanded="true" signature="7299:7305" ph=" }" />
+                <marker date="1490750644083" expanded="true" signature="3661:3672" ph=" { " />
+                <marker date="1490750644083" expanded="true" signature="3707:3713" ph=" }" />
+                <marker date="1490750644083" expanded="true" signature="5766:5777" ph=" { " />
+                <marker date="1490750644083" expanded="true" signature="5812:5818" ph=" }" />
+                <marker date="1490750644083" expanded="true" signature="7412:7423" ph=" { " />
+                <marker date="1490750644083" expanded="true" signature="7458:7464" ph=" }" />
               </folding>
             </state>
           </provider>
@@ -199,8 +161,8 @@
       <file leaf-file-name="RoomManagerImplTest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/RoomManagerImplTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="43">
-              <caret line="134" column="17" lean-forward="false" selection-start-line="134" selection-start-column="17" selection-end-line="134" selection-end-column="17" />
+            <state relative-caret-position="158">
+              <caret line="82" column="8" lean-forward="true" selection-start-line="82" selection-start-column="8" selection-end-line="83" selection-end-column="39" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -211,15 +173,38 @@
       <file leaf-file-name="GuestManagerImpl.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManagerImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="620">
-              <caret line="94" column="34" lean-forward="false" selection-start-line="94" selection-start-column="34" selection-end-line="94" selection-end-column="34" />
+            <state relative-caret-position="-261">
+              <caret line="72" column="0" lean-forward="false" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <marker date="1490742857485" expanded="true" signature="1171:1200" ph="DELETE FROM " />
-                <marker date="1490742857485" expanded="true" signature="1340:1403" ph="UPDATE guest... " />
-                <marker date="1490742857485" expanded="true" signature="1847:1867" ph="SELECT * FRO... guests" />
-                <marker date="1490742857485" expanded="true" signature="1983:2014" ph="SELECT * FRO... guests" />
-                <marker date="1490742857485" expanded="true" signature="2136:2169" ph="SELECT * FRO... guests" />
+                <marker date="1490745537579" expanded="true" signature="1171:1200" ph="DELETE FROM " />
+                <marker date="1490745537579" expanded="true" signature="1340:1403" ph="UPDATE guest... " />
+                <marker date="1490745537579" expanded="true" signature="1847:1867" ph="SELECT * FRO... guests" />
+                <marker date="1490745537579" expanded="true" signature="1983:2014" ph="SELECT * FRO... guests" />
+                <marker date="1490745537579" expanded="true" signature="2136:2169" ph="SELECT * FRO... guests" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GuestManager.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="110">
+              <caret line="15" column="16" lean-forward="false" selection-start-line="15" selection-start-column="16" selection-end-line="15" selection-end-column="16" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Guest.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Guest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="412">
+              <caret line="48" column="31" lean-forward="false" selection-start-line="48" selection-start-column="31" selection-end-line="48" selection-end-column="31" />
+              <folding>
+                <element signature="e#894#895#0" expanded="true" />
+                <element signature="e#940#941#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -284,9 +269,9 @@
         <option value="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Guest.java" />
         <option value="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestBuilder.java" />
         <option value="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Main.java" />
-        <option value="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManagerImpl.java" />
         <option value="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Booking.java" />
         <option value="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/BookingBuilder.java" />
+        <option value="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManagerImpl.java" />
         <option value="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestManagerImplTest.java" />
         <option value="$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/RoomManagerImplTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManagerImpl.java" />
@@ -1061,44 +1046,44 @@
       <workItem from="1490517371105" duration="3483000" />
       <workItem from="1490531595393" duration="1460000" />
       <workItem from="1490686269261" duration="9069000" />
-      <workItem from="1490730294077" duration="14359000" />
+      <workItem from="1490730294077" duration="19882000" />
     </task>
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="BookingManagerImplTest - 2017.03.29 at 01h 32m 14s.xml">
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 02h 36m 17s.xml">
       <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="BookingManagerImplTest - 2017.03.29 at 01h 36m 57s.xml">
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 02h 39m 57s.xml">
       <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="BookingManagerImplTest - 2017.03.29 at 01h 37m 49s.xml">
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 02h 40m 33s.xml">
       <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="BookingManagerImplTest - 2017.03.29 at 01h 39m 08s.xml">
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 02h 44m 48s.xml">
       <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="BookingManagerImplTest - 2017.03.29 at 01h 41m 50s.xml">
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 02h 49m 45s.xml">
       <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="BookingManagerImplTest - 2017.03.29 at 01h 45m 42s.xml">
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 02h 50m 24s.xml">
       <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="GuestManagerImplTest - 2017.03.29 at 01h 13m 05s.xml">
-      <configuration name="GuestManagerImplTest" configurationId="JUnit" />
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 02h 57m 38s.xml">
+      <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="GuestManagerImplTest - 2017.03.29 at 01h 13m 35s.xml">
-      <configuration name="GuestManagerImplTest" configurationId="JUnit" />
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 03h 00m 45s.xml">
+      <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="GuestManagerImplTest - 2017.03.29 at 01h 14m 29s.xml">
-      <configuration name="GuestManagerImplTest" configurationId="JUnit" />
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 03h 04m 49s.xml">
+      <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="GuestManagerImplTest - 2017.03.29 at 01h 14m 58s.xml">
-      <configuration name="GuestManagerImplTest" configurationId="JUnit" />
+    <history-entry file="BookingManagerImplTest - 2017.03.29 at 03h 24m 17s.xml">
+      <configuration name="BookingManagerImplTest" configurationId="JUnit" />
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="75319000" />
+    <option name="totallyTimeSpent" value="80842000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
@@ -1394,30 +1379,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Guest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="412">
-          <caret line="48" column="31" lean-forward="false" selection-start-line="48" selection-start-column="31" selection-end-line="48" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="13" column="39" lean-forward="false" selection-start-line="13" selection-start-column="39" selection-end-line="13" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
-          <caret line="27" column="52" lean-forward="false" selection-start-line="27" selection-start-column="52" selection-end-line="27" selection-end-column="52" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Main.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="680">
@@ -1425,37 +1386,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManagerImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="620">
-          <caret line="94" column="34" lean-forward="false" selection-start-line="94" selection-start-column="34" selection-end-line="94" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <marker date="1490742857485" expanded="true" signature="1171:1200" ph="DELETE FROM " />
-            <marker date="1490742857485" expanded="true" signature="1340:1403" ph="UPDATE guest... " />
-            <marker date="1490742857485" expanded="true" signature="1847:1867" ph="SELECT * FRO... guests" />
-            <marker date="1490742857485" expanded="true" signature="1983:2014" ph="SELECT * FRO... guests" />
-            <marker date="1490742857485" expanded="true" signature="2136:2169" ph="SELECT * FRO... guests" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Booking.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-214">
-          <caret line="73" column="33" lean-forward="true" selection-start-line="73" selection-start-column="33" selection-end-line="73" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="25" column="58" lean-forward="false" selection-start-line="25" selection-start-column="58" selection-end-line="25" selection-end-column="58" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1469,8 +1399,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/RoomManagerImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="34" column="0" lean-forward="false" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+        <state relative-caret-position="189">
+          <caret line="69" column="0" lean-forward="true" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <marker date="1490740510658" expanded="true" signature="1174:1202" ph="DELETE FROM " />
@@ -1482,55 +1412,116 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManagerImpl.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Booking.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="675">
-          <caret line="105" column="48" lean-forward="false" selection-start-line="105" selection-start-column="48" selection-end-line="105" selection-end-column="48" />
+        <state relative-caret-position="643">
+          <caret line="73" column="33" lean-forward="true" selection-start-line="73" selection-start-column="33" selection-end-line="73" selection-end-column="33" />
           <folding>
-            <marker date="1490743915392" expanded="true" signature="1398:1436" ph="SELECT * FRO... bookings" />
-            <marker date="1490743915392" expanded="true" signature="2241:2278" ph="SELECT * FRO... bookings" />
-            <marker date="1490743915392" expanded="true" signature="3070:3092" ph="SELECT * FRO... bookings" />
-            <marker date="1490743915392" expanded="true" signature="3214:3247" ph="SELECT * FRO... bookings" />
-            <marker date="1490743915392" expanded="true" signature="4469:4558" ph="UPDATE booki... " />
-            <marker date="1490743915392" expanded="true" signature="4884:4915" ph="DELETE FROM " />
+            <element signature="e#1420#1421#0" expanded="true" />
+            <element signature="e#1470#1471#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestManagerImplTest.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/Guest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="124">
-          <caret line="75" column="8" lean-forward="true" selection-start-line="75" selection-start-column="8" selection-end-line="83" selection-end-column="55" />
+        <state relative-caret-position="412">
+          <caret line="48" column="31" lean-forward="false" selection-start-line="48" selection-start-column="31" selection-end-line="48" selection-end-column="31" />
+          <folding>
+            <element signature="e#894#895#0" expanded="true" />
+            <element signature="e#940#941#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManagerImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-261">
+          <caret line="72" column="0" lean-forward="false" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2368#2369#0" expanded="true" />
-            <element signature="e#2414#2415#0" expanded="true" />
+            <marker date="1490745537579" expanded="true" signature="1171:1200" ph="DELETE FROM " />
+            <marker date="1490745537579" expanded="true" signature="1340:1403" ph="UPDATE guest... " />
+            <marker date="1490745537579" expanded="true" signature="1847:1867" ph="SELECT * FRO... guests" />
+            <marker date="1490745537579" expanded="true" signature="1983:2014" ph="SELECT * FRO... guests" />
+            <marker date="1490745537579" expanded="true" signature="2136:2169" ph="SELECT * FRO... guests" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/RoomManagerImplTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="43">
-          <caret line="134" column="17" lean-forward="false" selection-start-line="134" selection-start-column="17" selection-end-line="134" selection-end-column="17" />
+        <state relative-caret-position="158">
+          <caret line="82" column="8" lean-forward="true" selection-start-line="82" selection-start-column="8" selection-end-line="83" selection-end-column="39" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/BookingManagerImplTest.java">
+    <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestBuilder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="310" column="76" lean-forward="false" selection-start-line="310" selection-start-column="76" selection-end-line="310" selection-end-column="76" />
+        <state relative-caret-position="15">
+          <caret line="27" column="52" lean-forward="false" selection-start-line="27" selection-start-column="52" selection-end-line="27" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/GuestManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="15" column="16" lean-forward="false" selection-start-line="15" selection-start-column="16" selection-end-line="15" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/GuestManagerImplTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-159">
+          <caret line="172" column="36" lean-forward="true" selection-start-line="172" selection-start-column="36" selection-end-line="172" selection-end-column="36" />
           <folding>
             <element signature="imports" expanded="true" />
-            <marker date="1490744726561" expanded="true" signature="3786:3797" ph=" { " />
-            <marker date="1490744726561" expanded="true" signature="3832:3838" ph=" }" />
-            <marker date="1490744726561" expanded="true" signature="6264:6275" ph=" { " />
-            <marker date="1490744726561" expanded="true" signature="6310:6316" ph=" }" />
-            <marker date="1490744726561" expanded="true" signature="7253:7264" ph=" { " />
-            <marker date="1490744726561" expanded="true" signature="7299:7305" ph=" }" />
+            <element signature="e#2431#2432#0" expanded="true" />
+            <element signature="e#2477#2478#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="123">
+          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/cz/muni/fi/hotel/BookingManagerImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-193">
+          <caret line="55" column="96" lean-forward="false" selection-start-line="55" selection-start-column="96" selection-end-line="55" selection-end-column="96" />
+          <folding>
+            <marker date="1490749475629" expanded="true" signature="1398:1436" ph="SELECT * FRO... bookings" />
+            <marker date="1490749475629" expanded="true" signature="1585:1622" ph="SELECT * FRO... bookings" />
+            <marker date="1490749475629" expanded="true" signature="1748:1770" ph="SELECT * FRO... bookings" />
+            <marker date="1490749475629" expanded="true" signature="1892:1925" ph="SELECT * FRO... bookings" />
+            <marker date="1490749475629" expanded="true" signature="3147:3236" ph="UPDATE booki... " />
+            <marker date="1490749475629" expanded="true" signature="3562:3593" ph="DELETE FROM " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/cz/muni/fi/hotel/BookingManagerImplTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="358" column="0" lean-forward="false" selection-start-line="358" selection-start-column="0" selection-end-line="358" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <marker date="1490750644083" expanded="true" signature="3661:3672" ph=" { " />
+            <marker date="1490750644083" expanded="true" signature="3707:3713" ph=" }" />
+            <marker date="1490750644083" expanded="true" signature="5766:5777" ph=" { " />
+            <marker date="1490750644083" expanded="true" signature="5812:5818" ph=" }" />
+            <marker date="1490750644083" expanded="true" signature="7412:7423" ph=" { " />
+            <marker date="1490750644083" expanded="true" signature="7458:7464" ph=" }" />
           </folding>
         </state>
       </provider>

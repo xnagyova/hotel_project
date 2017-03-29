@@ -70,6 +70,7 @@ public class GuestManagerImpl implements GuestManager {
 
     @Override
     public void createGuest(Guest guest) {
+
         SimpleJdbcInsert insertGuest = new SimpleJdbcInsert(jdbc)
                 .withTableName("guests").usingGeneratedKeyColumns("id");
 

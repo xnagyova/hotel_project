@@ -47,40 +47,13 @@ public class BookingManagerImpl implements BookingManager {
 
     @Override
     public List<Booking> findAllBookingsOfGuest(final Guest guest) {
-        return jdbc.query("SELECT * FROM bookings WHERE guestId=?",
-                (rs, rowNum) -> {
-                    int price = rs.getInt("price");
-                    long roomId = rs.getLong("roomId");
-                    Room room = null;
-                    try {
-                        room = roomManager.findRoomById(roomId);
-                    } catch (Exception e) {
-                        log.error("cannot find room", e);
-                    }
-                    Date arrivalDate = rs.getDate("arrivalDate");
-                    Date departureDate = rs.getDate("departureDate");
-                    return new Booking(rs.getLong("id"), price, room, guest, arrivalDate, departureDate);
-                },
-                guest.getId());
+        return jdbc.query("SELECT * FROM bookings WHERE guestId=?", bookingMapper, guest.getId());
+
     }
 
     @Override
     public List<Booking> findAllBookingsOfRoom(final Room room) {
-        return jdbc.query("SELECT * FROM bookings WHERE roomId=?",
-                (rs, rowNum) -> {
-                    int price = rs.getInt("price");
-                    long guestId = rs.getLong("guestId");
-                    Guest guest = null;
-                    try {
-                        guest = guestManager.findGuestById(guestId);
-                    } catch (Exception e) {
-                        log.error("cannot find guest", e);
-                    }
-                    Date arrivalDate = rs.getDate("arrivalDate");
-                    Date departureDate = rs.getDate("departureDate");
-                    return new Booking(rs.getLong("id"), price, room, guest, arrivalDate, departureDate);
-                },
-                room.getId());
+        return jdbc.query("SELECT * FROM bookings WHERE roomId=?", bookingMapper, room.getId());
     }
 
     @Override

@@ -1,20 +1,24 @@
 package cz.muni.fi.hotel;
 
-
-import cz.muni.fi.hotel.common.IllegalEntityException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.xml.bind.ValidationException;
+import java.awt.print.Book;
 import java.time.*;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -30,26 +34,14 @@ public class BookingManagerImplTest {
 
     @Autowired
     private BookingManager bookingManager;
-
-    @Autowired
-    private GuestManager guestManager;
     @Autowired
     private RoomManager roomManager;
+    @Autowired
+    private GuestManager guestManager;
 
 
-    private static ApplicationContext ctx;
-    private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
+    //private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
 
-    @BeforeClass
-    public static void bookingManagerSetup() {
-        ctx = new AnnotationConfigApplicationContext(MySpringTestConfig.class);
-    }
-
-
-    @Before
-    public void setUp() throws Exception {
-        bookingManager = ctx.getBean("bookingManager", BookingManager.class);
-    }
 
     @Rule
     // attribute annotated with @Rule annotation must be public :-(
@@ -60,8 +52,8 @@ public class BookingManagerImplTest {
                 .price(20)
                 .room(sampleBigRoomBuilder().build())
                 .guest(sampleSamanthaGuestBuilder().build())
-                .arrivalDate(1650,4,12)
-                .departureDate(1650,4,19);
+                .arrivalDate(1975,3,12)
+                .departureDate(1978,4,30);
 
     }
 
@@ -70,8 +62,8 @@ public class BookingManagerImplTest {
                 .price(10)
                 .room(sampleSmallRoomBuilder().build())
                 .guest(sampleJohnGuestBuilder().build())
-                .arrivalDate(1020,8,7)
-                .departureDate(1020,8,31);
+                .arrivalDate(1076,8,7)
+                .departureDate(1080,9,31);
 
     }
 
@@ -79,7 +71,7 @@ public class BookingManagerImplTest {
     private GuestBuilder sampleJohnGuestBuilder() {
         return new GuestBuilder()
                 .name("John Fox")
-                .dateOfBirth(1980,4,22)
+                .dateOfBirth(1976,4,22)
                 .phoneNumber("+421947865586");
 
     }
@@ -94,7 +86,7 @@ public class BookingManagerImplTest {
     private GuestBuilder sampleSamantha2GuestBuilder() {
         return new GuestBuilder()
                 .name("Samantha Fox")
-                .dateOfBirth(1975,11,21)
+                .dateOfBirth(1972,11,21)
                 .phoneNumber("+421947741366");
 
     }
@@ -119,15 +111,17 @@ public class BookingManagerImplTest {
 
     @Test
     public void createBooking()  {
-
-        Booking booking = sampleFirstBookingBuilder().build();
+        Room room = roomManager.findRoomById(1l);
+        Guest guest = guestManager.findGuestById(1L);
+        Booking booking = new Booking();
+        booking.setGuest(guest);
+        booking.setRoom(room);
+        booking.setPrice(51);
+        booking.setArrivalDate(new Date(2013,12,10));
+        booking.setDepartureDate(new Date(2015,12,10));
         bookingManager.createBooking(booking);
-        Long bookingId = booking.getId();
         assertThat(booking.getId()).isNotNull();
 
-        assertThat(bookingManager.getBookingById(bookingId))
-                .isNotSameAs(booking)
-                .isEqualToComparingFieldByField(booking);
     }
 
 
@@ -142,7 +136,7 @@ public class BookingManagerImplTest {
                 .guest(null)
                 .build();
         assertThatThrownBy(() -> bookingManager.createBooking(booking))
-                .isInstanceOf(ValidationException.class);
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -187,23 +181,39 @@ public class BookingManagerImplTest {
 
     @Test
     public void deleteBooking() {
-        Booking firstBooking = sampleFirstBookingBuilder().build();
-        Booking secondBooking = sampleSecondBookingBuilder().build();
+        bookingManager.deleteBooking(bookingManager.getBookingById(1L));
+        try {
+            bookingManager.getBookingById(1L);
+            fail("booking 1 not deleted");
+        } catch (EmptyResultDataAccessException e) {
+            //no code
+        }
 
-        bookingManager.createBooking(firstBooking);
-        bookingManager.createBooking(secondBooking);
-
-        assertThat(bookingManager.getBookingById(firstBooking.getId())).isNotNull();
-        assertThat(bookingManager.getBookingById(secondBooking.getId())).isNotNull();
-
-        bookingManager.deleteBooking(firstBooking);
-        assertThat(bookingManager.getBookingById(firstBooking.getId())).isNull();
-        assertThat(bookingManager.getBookingById(secondBooking.getId())).isNotNull();
     }
 
     @Test(expected = NullPointerException.class)
     public void deleteNullBooking() {
         bookingManager.deleteBooking(null);
+    }
+    @Test
+    public void updateBooking() {
+        Booking bookingToUpdate = sampleFirstBookingBuilder().build();
+        Booking secondBooking = sampleSecondBookingBuilder().build();
+        bookingManager.createBooking(bookingToUpdate);
+        bookingManager.createBooking(secondBooking);
+
+        bookingToUpdate.setPrice(150);
+
+        bookingManager.updateBooking(bookingToUpdate);
+
+        assertThat(bookingManager.getBookingById(bookingToUpdate.getId()))
+                .isEqualToComparingFieldByField(bookingToUpdate);
+
+        assertThat(bookingManager.getBookingById(secondBooking.getId()))
+                .isEqualToComparingFieldByField(secondBooking);
+
+
+
     }
 
     @FunctionalInterface
@@ -211,9 +221,11 @@ public class BookingManagerImplTest {
         void callOn(T subjectOfOperation);
     }
 
-    private void testUpdateBooking(BookingManagerImplTest.Operation<Booking> updateOperation) {
+    private void testUpdateBooking(Operation<Booking> updateOperation) {
         Booking bookingToUpdate = sampleFirstBookingBuilder().build();
         Booking secondBooking = sampleSecondBookingBuilder().build();
+
+
         bookingManager.createBooking(bookingToUpdate);
         bookingManager.createBooking(secondBooking);
 
@@ -254,12 +266,12 @@ public class BookingManagerImplTest {
 
     @Test
     public void updateBookingArrivalDate() {
-        testUpdateBooking((booking) -> booking.setArrivalDate(new Date(1020,1,12)));
+        testUpdateBooking((booking) -> booking.setArrivalDate(new Date(1950,1,12)));
     }
 
     @Test
     public void updateBookingDepartureDate() {
-        testUpdateBooking((booking) -> booking.setDepartureDate(new Date(2020,12,19)));
+        testUpdateBooking((booking) -> booking.setDepartureDate(new Date(1979,12,19)));
     }
 
 
@@ -338,8 +350,8 @@ public class BookingManagerImplTest {
     @Test
     public void findAllBookings() {
 
-
         Booking firstBooking = sampleFirstBookingBuilder().build();
+        System.out.print("buildol som");
         Booking secondBooking = sampleSecondBookingBuilder().build();
 
         bookingManager.createBooking(firstBooking);
@@ -364,39 +376,23 @@ public class BookingManagerImplTest {
         assertThat(bookingManager.getBookingById(firstBookingId))
                 .isEqualToComparingFieldByField(firstBooking);
 
+
     }
 
     @Test
     public void findAllBookingsOfGuest() {
-        Booking firstBooking = sampleFirstBookingBuilder().guest(sampleSamantha2GuestBuilder().build()).build();
-        Booking secondBooking = sampleSecondBookingBuilder().guest(sampleSamantha2GuestBuilder().build()).build();
-        Booking thirdBooking = sampleFirstBookingBuilder().guest(sampleJohnGuestBuilder().build()).build();
 
-        bookingManager.createBooking(firstBooking);
-        bookingManager.createBooking(secondBooking);
-        bookingManager.createBooking(thirdBooking);
+        List<Booking> bookingList = bookingManager.findAllBookingsOfGuest(guestManager.findGuestById(1L));
+        assertThat(bookingList.size()==1);
 
-        assertThat(bookingManager.findAllBookingsOfGuest(sampleSamantha2GuestBuilder().build()))
-                .usingFieldByFieldElementComparator()
-                .contains(firstBooking,secondBooking)
-                .doesNotContain(thirdBooking);
 
     }
 
     @Test
     public void findAllBookingsOfRoom() {
-        Booking firstBooking = sampleFirstBookingBuilder().room(sampleBigRoomBuilder().build()).build();
-        Booking secondBooking = sampleSecondBookingBuilder().room(sampleBigRoomBuilder().build()).build();
-        Booking thirdBooking = sampleFirstBookingBuilder().room(sampleSmallRoomBuilder().build()).build();
+        List<Booking> bookingList = bookingManager.findAllBookingsOfRoom(roomManager.findRoomById(1L));
+        assertThat(bookingList.size()==1);
 
-        bookingManager.createBooking(firstBooking);
-        bookingManager.createBooking(secondBooking);
-        bookingManager.createBooking(thirdBooking);
-
-        assertThat(bookingManager.findAllBookingsOfGuest(sampleSamantha2GuestBuilder().build()))
-                .usingFieldByFieldElementComparator()
-                .contains(firstBooking,secondBooking)
-                .doesNotContain(thirdBooking);
 
     }
 
