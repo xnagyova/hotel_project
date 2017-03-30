@@ -2,8 +2,7 @@ package cz.muni.fi.hotel;
 
 import cz.muni.fi.hotel.common.*;
 
-import java.sql.SQLException;
-
+import jdk.nashorn.internal.ir.Assignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,10 +11,9 @@ import java.sql.*;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -28,7 +26,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
  * @author kkatanik & snagyova
  */
 public class BookingManagerImpl implements BookingManager {
-    final static Logger log = LoggerFactory.getLogger(BookingManagerImpl.class);
+
     private JdbcTemplate jdbc;
     private RoomManager roomManager;
     private GuestManager guestManager;
@@ -58,7 +56,9 @@ public class BookingManagerImpl implements BookingManager {
 
     @Override
     public List<Booking> findAllBookings() {
+
         return jdbc.query("SELECT * FROM bookings", bookingMapper);
+
     }
 
 
@@ -71,20 +71,20 @@ public class BookingManagerImpl implements BookingManager {
             new Booking(rs.getLong("id"), rs.getInt("price"),
                     roomManager.findRoomById(rs.getLong("roomId")),
                     guestManager.findGuestById(rs.getLong("guestId")),
-                    rs.getDate("arrivalDate"),
-                    rs.getDate("departureDate"));
+                    rs.getDate("arrivalDate").toLocalDate(),
+                    rs.getDate("departureDate").toLocalDate());
 
 
     @Override
     public void createBooking(Booking booking) {
-        SimpleJdbcInsert insertLease = new SimpleJdbcInsert(jdbc).withTableName("bookings").usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert insertBooking = new SimpleJdbcInsert(jdbc).withTableName("bookings").usingGeneratedKeyColumns("id");
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("price",booking.getPrice())
                 .addValue("roomId", booking.getRoom().getId())
                 .addValue("guestId", booking.getGuest().getId())
-                .addValue("arrivalDate", (booking.getArrivalDate()))
-                .addValue("departureDate", (booking.getDepartureDate()));
-        Number id = insertLease.executeAndReturnKey(parameters);
+                .addValue("arrivalDate", toSQLDate(booking.getArrivalDate()))
+                .addValue("departureDate", toSQLDate(booking.getDepartureDate()));
+        Number id = insertBooking.executeAndReturnKey(parameters);
         booking.setId(id.longValue());
         validate(booking);
     }
@@ -111,7 +111,7 @@ public class BookingManagerImpl implements BookingManager {
     }
 
     private void validate(Booking booking){
-        if (booking.getArrivalDate().after(booking.getDepartureDate())){
+        if (booking.getArrivalDate().isAfter(booking.getDepartureDate())){
             throw new ValidationException("Departure after arrival");
         }
         if (booking.getPrice()<=0){

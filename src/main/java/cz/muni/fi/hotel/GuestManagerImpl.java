@@ -6,19 +6,15 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.chrono.ChronoLocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-
-import java.time.LocalDate;
 import javax.sql.DataSource;
 
 /**
@@ -26,6 +22,7 @@ import javax.sql.DataSource;
  */
 public class GuestManagerImpl implements GuestManager {
     private JdbcTemplate jdbc;
+    private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
 
 
 
@@ -44,13 +41,17 @@ public class GuestManagerImpl implements GuestManager {
     public void updateGuestInformation(Guest guest) {
         validate(guest);
         jdbc.update("UPDATE guests set name=?,dateOfBirth=?,phoneNumber=? where id=?",
-                guest.getName(), guest.getDateOfBirth(), guest.getPhoneNumber(),guest.getId());
+                guest.getName(), toSQLDate(guest.getDateOfBirth()), guest.getPhoneNumber(),guest.getId());
         validate(guest);
+    }
+    private java.sql.Date toSQLDate(LocalDate localDate) {
+        if (localDate == null) return null;
+        return new java.sql.Date(ZonedDateTime.of(localDate.atStartOfDay(), ZoneId.systemDefault()).toInstant().toEpochMilli());
     }
 
     private RowMapper<Guest> guestMapper = (rs, rowNum) ->
             new Guest(rs.getLong("id"), rs.getString("name"),
-                    rs.getObject("dateOfBirth", Date.class), rs.getString("phoneNumber"));
+                    rs.getDate("dateOfBirth").toLocalDate(), rs.getString("phoneNumber"));
     @Transactional
     @Override
     public List<Guest> findAllGuests() {
@@ -76,7 +77,7 @@ public class GuestManagerImpl implements GuestManager {
 
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("name", guest.getName())
-                .addValue("dateOfBirth", guest.getDateOfBirth())
+                .addValue("dateOfBirth", toSQLDate(guest.getDateOfBirth()))
                 .addValue("phoneNumber", guest.getPhoneNumber());
 
         Number id = insertGuest.executeAndReturnKey(parameters);
@@ -86,7 +87,6 @@ public class GuestManagerImpl implements GuestManager {
 
     private static void validate(Guest guest){
 
-        Date now = new Date(2000,10,5);
         if (guest==null){
             throw new IllegalArgumentException("guest is null");
         }
@@ -99,7 +99,7 @@ public class GuestManagerImpl implements GuestManager {
         if (guest.getDateOfBirth() ==null){
             throw new IllegalArgumentException("date of birth is null");
         }
-        if (guest.getDateOfBirth().after(now)){
+        if (guest.getDateOfBirth().isAfter(ChronoLocalDate.from(TODAY))){
             throw new ValidationException("wrong date of birth");
         }
 

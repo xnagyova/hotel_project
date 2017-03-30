@@ -1,7 +1,6 @@
 package cz.muni.fi.hotel;
 
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import java.util.Collection;
+
 import java.util.List;
 
 /**

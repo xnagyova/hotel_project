@@ -2,6 +2,7 @@ package cz.muni.fi.hotel;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ public class GuestBuilder {
 
     private Long id;
     private String name;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     private String phoneNumber;
 
     public GuestBuilder id(Long id){
@@ -24,8 +25,8 @@ public class GuestBuilder {
         return this;
     }
 
-    public GuestBuilder dateOfBirth(int year, int month, int day) {
-        this.dateOfBirth = new Date(year, month, day);
+    public GuestBuilder dateOfBirth(int year, Month month, int day) {
+        this.dateOfBirth = LocalDate.of(year, month, day);
         return this;
     }
 
@@ -42,4 +43,6 @@ public class GuestBuilder {
         guest.setId(id);
         return guest;
     }
+
+
 }

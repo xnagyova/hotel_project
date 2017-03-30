@@ -1,10 +1,9 @@
 package cz.muni.fi.hotel;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by User on 8.3.2017.
+ * @author kkatanik & snagyova
  */
 public interface RoomManager {
 
@@ -13,7 +12,7 @@ public interface RoomManager {
     public void deleteRoom(Room room);
     public Room findRoomById(Long id);
     public List<Room> listAllRooms();
-    public List<Room> findFreeRooms();
+
 
 
 }

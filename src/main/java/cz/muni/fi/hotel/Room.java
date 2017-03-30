@@ -1,6 +1,5 @@
 package cz.muni.fi.hotel;
 
-import javax.xml.bind.ValidationException;
 
 /**
  * @author kkatanik & nagyova

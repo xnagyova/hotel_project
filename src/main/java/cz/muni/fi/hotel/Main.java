@@ -16,30 +16,49 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 
 public class Main {
 
     public static void main(String[] args) throws BookingException, IOException {
 
-        Properties myconf = new Properties();
-        myconf.load(Main.class.getResourceAsStream("/myconf.properties"));
+        //Properties myconf = new Properties();
+        //myconf.load(Main.class.getResourceAsStream("/myconf.properties"));
 
 
 
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
         GuestManager guestManager = ctx.getBean(GuestManager.class);
         RoomManager roomManager = ctx.getBean(RoomManager.class);
+        BookingManager bookingManager = ctx.getBean(BookingManager.class);
 
+
+        //guestManager.findAllGuests().forEach(System.out::println);
+
+        //roomManager.listAllRooms().forEach(System.out::println);
+
+        //bookingManager.findAllBookings().forEach(System.out::println);
+
+        Guest guest = new Guest(null, "Jan Novák", LocalDate.of(1986,05,4), "602123456");
+        guestManager.createGuest(guest);
+        Room room = new Room(null, 4,5,true);
+        roomManager.buildRoom(room);
+        Booking booking = new Booking(null, 52, room,guest, LocalDate.of(2000,2,2), LocalDate.of(2000,5,5));
+        bookingManager.createBooking(booking);
+        System.out.println(booking);
+        booking.setPrice(12);
+        booking.setArrivalDate(LocalDate.of(1980,11,1));
+        bookingManager.updateBooking(booking);
+        System.out.println(booking);
         guestManager.findAllGuests().forEach(System.out::println);
 
         roomManager.listAllRooms().forEach(System.out::println);
+        //bookingManager.findAllBookings().forEach(System.out::println);
 
-        Guest guest = new Guest(null, "Jan Novák", new Date(1986,05,4), "602123456");
-        guestManager.createGuest(guest);
+
 
 
     }
@@ -89,14 +108,5 @@ public class Main {
 
 
     }
-    /*
-    Room room = allRooms.get(0);
-    Guest guest = allGuests.get(0);
-    Booking booking = new Booking(null, 35, room, guest, LocalDate.now(),LocalDate.now().plusDays(30));
-    BookingManager bookingManager =
-        leaseManager.createLease(lease);
 
-    List<Lease> leasesForCustomer = leaseManager.getLeasesForCustomer(customer);
-        System.out.println("leasesForCustomer = " + leasesForCustomer);
-        */
 }

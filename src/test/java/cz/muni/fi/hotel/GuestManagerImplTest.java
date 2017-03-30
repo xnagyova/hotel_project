@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -33,7 +34,8 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 @ContextConfiguration(classes = {MySpringTestConfig.class}) //konfigurace je ve třídě MySpringTestConfig
 public class GuestManagerImplTest {
 
-    private final static Date now = new Date(1,1,1);
+    private final static ZonedDateTime TODAY= LocalDateTime.now().atZone(ZoneId.of("UTC"));
+    private final static ZonedDateTime TOMORROW = TODAY.plusDays(1);
 
 
     @Autowired
@@ -47,10 +49,9 @@ public class GuestManagerImplTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     private GuestBuilder sampleJohnGuestBuilder() {
-        GregorianCalendar gc = new GregorianCalendar(1999, Calendar.DECEMBER, 10);
         return new GuestBuilder()
                 .name("John Fox")
-                .dateOfBirth(1989,12,5)
+                .dateOfBirth(1989, Month.DECEMBER,5)
                 .phoneNumber("+421947865586");
 
     }
@@ -59,14 +60,14 @@ public class GuestManagerImplTest {
     private GuestBuilder sampleSamanthaGuestBuilder() {
         return new GuestBuilder()
                 .name("Samantha Fox")
-                .dateOfBirth(1974,8,10)
+                .dateOfBirth(1974,Month.AUGUST,10)
                 .phoneNumber("+421947842396");
 
     }
     private GuestBuilder sampleSamantha2GuestBuilder() {
         return new GuestBuilder()
                 .name("Samantha Fox")
-                .dateOfBirth(1975,11,21)
+                .dateOfBirth(1975,Month.NOVEMBER,21)
                 .phoneNumber("+421947741366");
 
     }
@@ -96,7 +97,8 @@ public class GuestManagerImplTest {
     public void createGuestBornTomorrow() {
 
         Guest guest =sampleJohnGuestBuilder()
-                .dateOfBirth(2000,10,6)
+                .dateOfBirth(TOMORROW.getYear(),TOMORROW.getMonth(),TOMORROW.getDayOfMonth())
+
                 .build();
         assertThatThrownBy(() -> guestManager.createGuest(guest))
                 .isInstanceOf(cz.muni.fi.hotel.common.ValidationException.class);
@@ -105,7 +107,7 @@ public class GuestManagerImplTest {
     @Test
     public void createGuestBornToday() {
         Guest guest = sampleJohnGuestBuilder()
-                .dateOfBirth(2000,10,5)
+                .dateOfBirth(2000,Month.OCTOBER,5)
                 .build();
         guestManager.createGuest(guest);
 
@@ -217,7 +219,7 @@ public class GuestManagerImplTest {
 
     @Test
     public void updateGuestDateOfBirth() {
-        testUpdateGuestInformation((guest) -> guest.setDateOfBirth(new Date(1999,12,12)));
+        testUpdateGuestInformation((guest) -> guest.setDateOfBirth(LocalDate.of(1999,12,12)));
     }
 
     @Test
@@ -253,9 +255,9 @@ public class GuestManagerImplTest {
     @Test
     public void updateGuestWithTomorrowDateOfBirth() {
 
-        Guest guest = sampleJohnGuestBuilder().dateOfBirth(1998,1,1).build();
+        Guest guest = sampleJohnGuestBuilder().dateOfBirth(1998,Month.JANUARY,1).build();
         guestManager.createGuest(guest);
-        guest.setDateOfBirth(new Date(2000,10,6));
+        guest.setDateOfBirth(TOMORROW.toLocalDate());
 
         expectedException.expect(cz.muni.fi.hotel.common.ValidationException.class);
         guestManager.updateGuestInformation(guest);

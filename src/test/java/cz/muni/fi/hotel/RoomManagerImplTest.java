@@ -228,25 +228,6 @@ public class RoomManagerImplTest {
 
 
 
-    @Test
-    public void findFreeRoom() {
-        assertThat(roomManager.findFreeRooms()).isEmpty();
-
-        Room fullRoom1 = sampleBigRoomBuilder().capacity(0).build();
-        Room fullRoom2 = sampleSmallRoomBuilder().capacity(0).build();
-        Room notFullRoom1 = sampleBigRoomBuilder().capacity(1).build();
-        Room notFullRoom2 = sampleSmallRoomBuilder().build();
-
-        roomManager.buildRoom(fullRoom1);
-        roomManager.buildRoom(fullRoom2);
-        roomManager.buildRoom(notFullRoom1);
-        roomManager.buildRoom(notFullRoom2);
-
-        assertThat(roomManager.findFreeRooms())
-                .usingFieldByFieldElementComparator()
-                .containsOnly(notFullRoom1,notFullRoom2);
-
-    }
 
     @Test
     public void findRoomById() {

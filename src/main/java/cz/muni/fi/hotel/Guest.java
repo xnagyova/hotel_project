@@ -1,9 +1,10 @@
 package cz.muni.fi.hotel;
 
+
 import java.time.LocalDate;
 import java.util.Date;
 
-import static java.lang.Long.compare;
+
 
 /**
  * @author kkatanik & snagyova
@@ -12,13 +13,13 @@ public class Guest  {
 
     private Long id;
     private String name;
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     private String phoneNumber;
 
     public Guest() {
     }
 
-    public Guest(Long id, String name,Date dateOfBirth, String phoneNumber) {
+    public Guest(Long id, String name,LocalDate dateOfBirth, String phoneNumber) {
         this.id = id;
         this.name = name;
         this.dateOfBirth = dateOfBirth;
@@ -42,11 +43,11 @@ public class Guest  {
         this.name = name;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 

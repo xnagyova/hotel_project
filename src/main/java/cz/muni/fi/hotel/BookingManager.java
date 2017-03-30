@@ -1,9 +1,5 @@
 package cz.muni.fi.hotel;
 
-import cz.muni.fi.hotel.common.BookingException;
-import cz.muni.fi.hotel.common.RoomException;
-
-import java.util.Collection;
 import java.util.List;
 
 /**

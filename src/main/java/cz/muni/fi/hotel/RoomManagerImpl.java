@@ -1,25 +1,11 @@
 package cz.muni.fi.hotel;
-
-import cz.muni.fi.hotel.common.DBUtils;
-import cz.muni.fi.hotel.common.IllegalEntityException;
-import cz.muni.fi.hotel.common.ServiceFailureException;
-
-
 import cz.muni.fi.hotel.common.ValidationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.annotation.Transactional;
-import sun.security.validator.ValidatorException;
-
-import java.sql.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 /**
@@ -57,10 +43,7 @@ public class RoomManagerImpl implements RoomManager{
         return jdbc.query("SELECT * FROM rooms", roomMapper);
     }
 
-    @Override
-    public List<Room> findFreeRooms() {
-        return jdbc.query("SELECT * FROM rooms WHERE capacity > 0", roomMapper);
-    }
+
 
     @Override
     public Room findRoomById(Long id) {

@@ -8,17 +8,13 @@ import java.util.Date;
  * @author kkatanik & snagyova
  */
 public class BookingBuilder {
-    private Long id;
+
     private int price;
     private Room room;
     private Guest guest;
-    private Date arrivalDate;
-    private Date departureDate;
+    private LocalDate arrivalDate;
+    private LocalDate departureDate;
 
-    public BookingBuilder id(Long id){
-        this.id = id;
-        return this;
-    }
 
     public BookingBuilder price(int price){
         this.price = price;
@@ -35,20 +31,19 @@ public class BookingBuilder {
         return this;
     }
 
-    public BookingBuilder arrivalDate(int year, int month, int day) {
-        this.arrivalDate = new Date(year, month, day);
+    public BookingBuilder arrivalDate(int year, Month month, int day) {
+        this.arrivalDate = LocalDate.of(year,month,day);
         return this;
     }
 
-    public BookingBuilder departureDate(int year,int month, int day) {
-        this.departureDate = new Date(year, month, day);
+    public BookingBuilder departureDate(int year,Month month, int day) {
+        this.departureDate = LocalDate.of(year, month, day);
         return this;
     }
 
 
     public Booking build(){
         Booking booking = new Booking();
-        booking.setId(id);
         booking.setPrice(price);
         booking.setRoom(room);
         booking.setGuest(guest);

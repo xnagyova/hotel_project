@@ -12,13 +12,13 @@ public class Booking {
     private int price;
     private Room room;
     private Guest guest;
-    private Date arrivalDate;
-    private Date departureDate;
+    private LocalDate arrivalDate;
+    private LocalDate departureDate;
 
 
     public Booking() {}
 
-    public Booking(Long id, int price, Room room, Guest guest, Date arrivalDate, Date departureDate) {
+    public Booking(Long id, int price, Room room, Guest guest, LocalDate arrivalDate, LocalDate departureDate) {
         this.id = id;
         this.price = price;
         this.room = room;
@@ -59,19 +59,19 @@ public class Booking {
         this.guest = guest;
     }
 
-    public Date getArrivalDate() {
+    public LocalDate getArrivalDate() {
         return arrivalDate;
     }
 
-    public void setArrivalDate(Date arrivalDate) {
+    public void setArrivalDate(LocalDate arrivalDate) {
         this.arrivalDate = arrivalDate;
     }
 
-    public Date getDepartureDate() {
+    public LocalDate getDepartureDate() {
         return departureDate;
     }
 
-    public void setDepartureDate(Date departureDate) {
+    public void setDepartureDate(LocalDate departureDate) {
         this.departureDate = departureDate;
     }
 
