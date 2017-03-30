@@ -37,7 +37,6 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 @RunWith(SpringJUnit4ClassRunner.class) //Spring se zúčastní unit testů
 @ContextConfiguration(classes = {MySpringTestConfig.class}) //konfigurace je ve třídě MySpringTestConfig
 public class RoomManagerImplTest {
-    private JdbcTemplate jdbc;
 
     @Autowired
     private RoomManager roomManager;
@@ -210,15 +209,19 @@ public class RoomManagerImplTest {
 
     @Test
     public void deleteRoom()  {
-        System.out.println(roomManager.listAllRooms());
-        roomManager.deleteRoom(roomManager.findRoomById(1L));
+        Room room1 = sampleBigRoomBuilder().build();
+        Room room2 = sampleSmallRoomBuilder().build();
+        roomManager.buildRoom(room1);
+        roomManager.buildRoom(room2);
+        Long room1Id = room1.getId();
+        roomManager.deleteRoom(roomManager.findRoomById(room1.getId()));
         try {
-            roomManager.findRoomById(1L);
+            roomManager.findRoomById(room1Id);
             fail("room 1 not deleted");
         } catch (EmptyResultDataAccessException e) {
 
-            }
-
+        }
+        assertThat(roomManager.findRoomById(room2.getId())).isNotNull();
     }
 
     @Test(expected = IllegalArgumentException.class)

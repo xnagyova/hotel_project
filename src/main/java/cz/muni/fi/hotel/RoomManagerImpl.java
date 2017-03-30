@@ -1,5 +1,6 @@
 package cz.muni.fi.hotel;
 import cz.muni.fi.hotel.common.ValidationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -47,7 +48,10 @@ public class RoomManagerImpl implements RoomManager{
 
     @Override
     public Room findRoomById(Long id) {
-        return jdbc.queryForObject("SELECT * FROM rooms WHERE id=?", roomMapper, id);
+        if(id==null){
+            return null;
+        }
+            return jdbc.queryForObject("SELECT * FROM rooms WHERE id=?", roomMapper, id);
     }
 
 

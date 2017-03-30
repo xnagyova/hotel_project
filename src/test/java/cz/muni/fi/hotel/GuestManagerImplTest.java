@@ -144,16 +144,19 @@ public class GuestManagerImplTest {
 
     @Test
     public void deleteGuest() {
-
-        guestManager.deleteGuest(guestManager.findGuestById(1L));
+        Guest guest = sampleJohnGuestBuilder().build();
+        Guest secondGuest = sampleSamanthaGuestBuilder().build();
+        guestManager.createGuest(guest);
+        guestManager.createGuest(secondGuest);
+        Long guestId = guest.getId();
+        guestManager.deleteGuest(guest);
         try {
-            guestManager.findGuestById(1L);
+            guestManager.findGuestById(guestId);
             fail("guest 1 not deleted");
         } catch (EmptyResultDataAccessException e) {
             //no code
         }
-
-
+        assertThat(guestManager.findGuestById(secondGuest.getId())).isNotNull();
     }
 
     @Test(expected = IllegalArgumentException.class)

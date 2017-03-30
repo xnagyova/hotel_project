@@ -1,6 +1,7 @@
 package cz.muni.fi.hotel;
 
 import cz.muni.fi.hotel.common.ValidationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -60,11 +61,17 @@ public class GuestManagerImpl implements GuestManager {
 
     @Override
     public Guest findGuestById(Long id) {
-        return jdbc.queryForObject("SELECT * FROM guests WHERE id=?", guestMapper, id);
+        if(id == null){
+            return null;
+        }
+            return jdbc.queryForObject("SELECT * FROM guests WHERE id=?", guestMapper, id);
     }
 
     @Override
     public List<Guest> findGuestByName(String name){
+        if(name == null){
+            return null;
+        }
         return jdbc.query("SELECT * FROM guests WHERE name=?", guestMapper, name);
     }
 

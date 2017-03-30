@@ -92,9 +92,10 @@ public class BookingManagerImpl implements BookingManager {
     @Override
     public void updateBooking(Booking booking) {
         validate(booking);
-        jdbc.update("UPDATE bookings set price=?,roomId=?,guestId=?, arrivalDate=?, departureDate=? where id=?",
-                booking.getPrice(), booking.getRoom().getId(), booking.getGuest().getId(),booking.getArrivalDate(),
-                booking.getDepartureDate(),booking.getId());
+        this.jdbc.update("UPDATE bookings SET price=?,roomId=?,guestId=?, arrivalDate=?, departureDate=? WHERE id=?",
+                booking.getPrice(), booking.getRoom().getId(), booking.getGuest().getId(),
+                toSQLDate(booking.getArrivalDate()),
+                toSQLDate(booking.getDepartureDate()),booking.getId());
         validate(booking);
     }
 

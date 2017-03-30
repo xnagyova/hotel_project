@@ -4,6 +4,7 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,22 +43,30 @@ public class BookingManagerImplTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     private BookingBuilder sampleFirstBookingBuilder()  {
+        Room room = sampleBigRoomBuilder().build();
+        roomManager.buildRoom(room);
+        Guest guest = sampleJohnGuestBuilder().build();
+        guestManager.createGuest(guest);
         return new BookingBuilder()
                 .price(20)
-                .room(sampleBigRoomBuilder().build())
-                .guest(sampleSamanthaGuestBuilder().build())
+                .room(room)
+                .guest(guest)
                 .arrivalDate(1975, Month.APRIL,12)
                 .departureDate(1978,Month.MAY,30);
 
     }
 
     private BookingBuilder sampleSecondBookingBuilder()  {
+        Room room = sampleSmallRoomBuilder().build();
+        roomManager.buildRoom(room);
+        Guest guest = sampleSamanthaGuestBuilder().build();
+        guestManager.createGuest(guest);
         return new BookingBuilder()
                 .price(10)
-                .room(sampleSmallRoomBuilder().build())
-                .guest(sampleJohnGuestBuilder().build())
-                .arrivalDate(1076,Month.AUGUST,7)
-                .departureDate(1080,Month.SEPTEMBER,30);
+                .room(room)
+                .guest(guest)
+                .arrivalDate(2015,Month.AUGUST,7)
+                .departureDate(2016,Month.SEPTEMBER,30);
 
     }
 
@@ -278,6 +287,133 @@ public class BookingManagerImplTest {
 
 
     }
+
+
+    @Test
+    public void getBookingById() {
+        Guest guest = sampleJohnGuestBuilder().build();
+        Room room = sampleBigRoomBuilder().build();
+        roomManager.buildRoom(room);
+        guestManager.createGuest(guest);
+        Booking firstBooking = sampleFirstBookingBuilder().guest(guest).room(room).build();
+        Booking secondBooking = sampleSecondBookingBuilder().guest(guest).room(room).build();
+
+        bookingManager.createBooking(firstBooking);
+        bookingManager.createBooking(secondBooking);
+
+        Long firstBookingId = firstBooking.getId();
+
+        assertThat(bookingManager.getBookingById(firstBookingId))
+                .isEqualToComparingFieldByField(firstBooking);
+
+
+    }
+    @Test
+    public void updateBooking() {
+        Booking bookingToUpdate = sampleFirstBookingBuilder().build();
+        Booking secondBooking = sampleSecondBookingBuilder().build();
+        bookingManager.createBooking(bookingToUpdate);
+        bookingManager.createBooking(secondBooking);
+
+        bookingToUpdate.setPrice(150);
+
+        bookingManager.updateBooking(bookingToUpdate);
+
+        assertThat(bookingManager.getBookingById(bookingToUpdate.getId()))
+                .isEqualToComparingFieldByField(bookingToUpdate);
+
+        assertThat(bookingManager.getBookingById(secondBooking.getId()))
+                .isEqualToComparingFieldByField(secondBooking);
+
+
+
+    }
+
+    @FunctionalInterface
+    private interface Operation<T> {
+        void callOn(T subjectOfOperation);
+    }
+
+    private void testUpdateBooking(Operation<Booking> updateOperation) {
+        Guest guest = sampleJohnGuestBuilder().build();
+        Room room = sampleBigRoomBuilder().build();
+        roomManager.buildRoom(room);
+        guestManager.createGuest(guest);
+        Booking bookingToUpdate = sampleFirstBookingBuilder().guest(guest).room(room).build();
+        Booking secondBooking = sampleSecondBookingBuilder().guest(guest).room(room).build();
+
+
+        bookingManager.createBooking(bookingToUpdate);
+        bookingManager.createBooking(secondBooking);
+
+        updateOperation.callOn(bookingToUpdate);
+
+        bookingManager.updateBooking(bookingToUpdate);
+
+        assertThat(bookingManager.getBookingById(bookingToUpdate.getId()))
+                .isEqualToComparingFieldByField(bookingToUpdate);
+
+        assertThat(bookingManager.getBookingById(secondBooking.getId()))
+                .isEqualToComparingFieldByField(secondBooking);
+    }
+
+
+
+
+    @Test
+    public void updateBookingPrice() {
+        testUpdateBooking((booking) -> booking.setPrice(100));
+
+    }
+
+    @Test
+    public void updateBookingGuest() {
+        Guest guest = sampleSamantha2GuestBuilder().build();
+        guestManager.createGuest(guest);
+        testUpdateBooking((booking) -> booking.setGuest(guest));
+
+    }
+
+    @Test
+    public void updateBookingRoom() {
+        Room room = sampleSmallRoomBuilder().build();
+        roomManager.buildRoom(room);
+        testUpdateBooking((booking) -> booking.setRoom(room));
+
+    }
+
+    @Test
+    public void updateBookingArrivalDate() {
+        testUpdateBooking((booking) -> booking.setArrivalDate(LocalDate.of(1950,Month.AUGUST,12)));
+    }
+
+    @Test
+    public void updateBookingDepartureDate() {
+        testUpdateBooking((booking) -> booking.setDepartureDate(LocalDate.of(1979,Month.APRIL,19)));
+    }
+
+
+
+
+
+
+
+    @Test
+    public void findAllBookings() {
+
+        Booking firstBooking = sampleFirstBookingBuilder().build();
+        Booking secondBooking = sampleSecondBookingBuilder().build();
+
+        bookingManager.createBooking(firstBooking);
+        bookingManager.createBooking(secondBooking);
+
+        assertThat(bookingManager.findAllBookings())
+                .usingFieldByFieldElementComparator()
+                .contains(firstBooking,secondBooking);
+
+    }
+
+
 
 
 
