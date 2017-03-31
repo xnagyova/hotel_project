@@ -27,6 +27,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
  */
 public class BookingManagerImpl implements BookingManager {
 
+    final static Logger log = LoggerFactory.getLogger(BookingManagerImpl.class);
     private JdbcTemplate jdbc;
     private RoomManager roomManager;
     private GuestManager guestManager;
@@ -52,6 +53,20 @@ public class BookingManagerImpl implements BookingManager {
     @Override
     public List<Booking> findAllBookingsOfRoom(final Room room) {
         return jdbc.query("SELECT * FROM bookings WHERE roomId=?", bookingMapper, room.getId());
+    }
+
+    @Override
+    public List<Room> findFreeRooms() {
+        List<Long> ids = jdbc.queryForList("SELECT id FROM rooms WHERE id NOT IN (SELECT roomId FROM bookings)", Long.class);
+        List<Room> rooms = new ArrayList<>(ids.size());
+        for (Long id : ids) {
+            try {
+                rooms.add(roomManager.findRoomById(id));
+            } catch (Exception e) {
+                log.error("room problem",e);
+            }
+        }
+        return rooms;
     }
 
     @Override

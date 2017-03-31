@@ -394,7 +394,21 @@ public class BookingManagerImplTest {
 
 
 
+    @Test
+    public void findFreeRooms() {
+        Room room1 = sampleBigRoomBuilder().build();
+        Room room2 = sampleSmallRoomBuilder().build();
+        Room roomInBooking = sampleBigRoomBuilder().capacity(100).build();
+        roomManager.buildRoom(room1);
+        roomManager.buildRoom(room2);
+        roomManager.buildRoom(roomInBooking);
 
+        Booking booking = sampleFirstBookingBuilder().room(roomInBooking).build();
+        bookingManager.createBooking(booking);
+
+        assertThat(bookingManager.findFreeRooms()).contains(room1,room2)
+                .doesNotContain(roomInBooking);
+    }
 
 
 
