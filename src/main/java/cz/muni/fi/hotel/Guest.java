@@ -2,8 +2,6 @@ package cz.muni.fi.hotel;
 
 
 import java.time.LocalDate;
-import java.util.Date;
-
 
 
 /**

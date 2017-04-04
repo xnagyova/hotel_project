@@ -2,7 +2,6 @@ package cz.muni.fi.hotel;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Date;
 
 /**
  * @author kkatanik & snagyova

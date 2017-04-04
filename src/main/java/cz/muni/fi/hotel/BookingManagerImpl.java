@@ -2,7 +2,6 @@ package cz.muni.fi.hotel;
 
 import cz.muni.fi.hotel.common.*;
 
-import jdk.nashorn.internal.ir.Assignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,8 +10,6 @@ import java.sql.*;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

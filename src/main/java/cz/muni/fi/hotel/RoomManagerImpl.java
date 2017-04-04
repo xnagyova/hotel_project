@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 /**
  *@author kkatanik & snagyova
  */
-public class RoomManagerImpl implements RoomManager{
+public class RoomManagerImpl implements RoomManager {
 
     private JdbcTemplate jdbc;
 
@@ -31,7 +31,7 @@ public class RoomManagerImpl implements RoomManager{
     public void updateRoomInformation(Room room) {
         validate(room);
         jdbc.update("UPDATE rooms set floorNumber=?,capacity=?,balcony=? where id=?",
-                room.getFloorNumber(), room.getCapacity(), room.isBalcony()?1:0,room.getId());
+                room.getFloorNumber(), room.getCapacity(), room.isBalcony() ? 1 : 0, room.getId());
         validate(room);
     }
 
@@ -45,13 +45,12 @@ public class RoomManagerImpl implements RoomManager{
     }
 
 
-
     @Override
     public Room findRoomById(Long id) {
-        if(id==null){
+        if (id == null) {
             return null;
         }
-            return jdbc.queryForObject("SELECT * FROM rooms WHERE id=?", roomMapper, id);
+        return jdbc.queryForObject("SELECT * FROM rooms WHERE id=?", roomMapper, id);
     }
 
 
@@ -65,12 +64,14 @@ public class RoomManagerImpl implements RoomManager{
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("floorNumber", room.getFloorNumber())
                 .addValue("capacity", room.getCapacity())
-                .addValue("balcony", room.isBalcony()?1:0);
+                .addValue("balcony", room.isBalcony() ? 1 : 0);
 
         Number id = insertRoom.executeAndReturnKey(parameters);
         room.setId(id.longValue());
         validate(room);
     }
+
+
 
     private static void validate(Room room){
         if (room==null){
@@ -81,6 +82,9 @@ public class RoomManagerImpl implements RoomManager{
         }
         if (room.getFloorNumber()<0){
             throw new ValidationException("floor number cannot be negative");
+        }
+        if (!room.isBalcony() && room.isBalcony()){
+            throw new ValidationException("balcony unspecified");
         }
     }
 
