@@ -13,7 +13,7 @@ import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
 
 /**
- * Created by ${KristianKatanik} on 03.04.2017.
+ * @author kkatanik && snagyova
  */
 @WebListener
 public class StartListener implements ServletContextListener {
