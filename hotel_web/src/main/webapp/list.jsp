@@ -15,6 +15,7 @@
 <table border="1">
     <thead>
     <tr>
+        <th>id</th>
         <th>číslo poschodia</th>
         <th>kapacita</th>
         <th>balkón</th>
@@ -22,14 +23,18 @@
     </thead>
     <c:forEach items="${rooms}" var="room">
         <tr>
+            <td><c:out value="${room.id}"/></td>
             <td><c:out value="${room.floorNumber}"/></td>
             <td><c:out value="${room.capacity}"/></td>
             <td><c:out value="${room.balcony}"/></td>
             <td><form method="post" action="${pageContext.request.contextPath}/rooms/delete?id=${room.id}"
                       style="margin-bottom: 0;"><input type="submit" value="Zmazať"></form></td>
+            <td><form method="post" action="${pageContext.request.contextPath}/rooms/update?id=${room.id}"
+                      style="margin-bottom: 0;"><input type="submit" value="Editovať"></form></td>
         </tr>
     </c:forEach>
 </table>
+
 
 <h2>Zadajte izbu</h2>
 <c:if test="${not empty chyba}">

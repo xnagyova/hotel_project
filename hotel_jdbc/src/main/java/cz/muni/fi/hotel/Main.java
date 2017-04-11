@@ -73,7 +73,7 @@ public class Main {
         room.setBalcony(false);
         roomManager.updateRoomInformation(room);
         System.out.println(room);
-/*
+
         Booking booking = new Booking(null, 52, room,guest, LocalDate.of(2000,2,2), LocalDate.of(2000,5,5));
         bookingManager.createBooking(booking);
         System.out.println(booking);
@@ -89,7 +89,7 @@ public class Main {
         roomManager.listAllRooms().forEach(System.out::println);
         bookingManager.findAllBookings().forEach(System.out::println);
 
-*/
+
 
 
     }

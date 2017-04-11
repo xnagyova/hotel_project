@@ -7,6 +7,7 @@ import org.apache.derby.client.am.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,11 +21,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
- * Created by ${KristianKatanik} on 03.04.2017.
+ *@author kkatanik & snagyova
  */
 @WebServlet(GuestsServlet.URL_MAPPING + "/*")
 public class GuestsServlet extends HttpServlet{
-    private static final String LIST_JSP = "/list.jsp";
+    private static final String LIST_JSP = "/list2.jsp";
     public static final String URL_MAPPING = "/guests";
 
     private final static Logger log = LoggerFactory.getLogger(GuestsServlet.class);
@@ -44,20 +45,42 @@ public class GuestsServlet extends HttpServlet{
         log.debug("POST ... {}",action);
         switch (action) {
             case "/add":
-                //getting POST parameters from form
-                String name = request.getParameter("name");
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd");
-                formatter = formatter.withLocale(Locale.UK );
-                LocalDate dateOfBirth = LocalDate.parse(request.getParameter("dateOfBirth"), formatter);
-                String phoneNumber = request.getParameter("phoneNumber");
-                //form data validity check
-                if (name == null || name.length() == 0 || phoneNumber == null || phoneNumber.length() == 0) {
-                    request.setAttribute("chyba", "Je nutné vyplniť všetky hodnoty !");
+                if((request.getParameter("name") == "") || (request.getParameter("dateOfBirth") == "")||
+                        (request.getParameter("phoneNumber") == "")){
+                    request.setAttribute("chyba", "Je nutné vyplniť všetky hodnoty!");
                     log.debug("form data invalid");
                     showGuestsList(request, response);
                     return;
                 }
-                //form data processing - storing to database
+                if ((request.getParameter("phoneNumber").matches("[^+0-9]"))){
+                    request.setAttribute("chyba", "Nekorektný formát telefónneho čísla!");
+                    log.debug("form data invalid");
+                    showGuestsList(request, response);
+                    return;
+                }
+                if ((!request.getParameter("dateOfBirth").matches(("\\d{4}-\\d{2}-\\d{2}")))){
+                    request.setAttribute("chyba", "Nekorektný formát dátumu narodenia. Korektný formát: yyyy-mm-dd!");
+                    log.debug("form data invalid");
+                    showGuestsList(request, response);
+                    return;
+                }
+
+                //getting POST parameters from form
+                String name = request.getParameter("name");
+                String[] dateParameter = request.getParameter("dateOfBirth").split("-");
+                LocalDate dateOfBirth = LocalDate.of(Integer.parseInt(dateParameter[0]),
+                        Integer.parseInt(dateParameter[1]),Integer.parseInt(dateParameter[2]));
+                String phoneNumber = request.getParameter("phoneNumber");
+                if (dateOfBirth.isAfter(LocalDate.now())){
+                    request.setAttribute("chyba", "Nekorektný dátum narodenia!");
+                    log.debug("form data invalid");
+                    showGuestsList(request, response);
+                    return;
+
+                }
+
+
+
                 try {
                     Guest guest = new Guest(null, name, dateOfBirth, phoneNumber);
                     getGuestManager().createGuest(guest);

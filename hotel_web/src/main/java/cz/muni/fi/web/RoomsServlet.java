@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
- * Created by ${KristianKatanik} on 04.04.2017.
+ *@author kkatanik & snagyova
  */
 @WebServlet(RoomsServlet.URL_MAPPING + "/*")
 public class RoomsServlet extends HttpServlet {
@@ -43,16 +43,30 @@ public class RoomsServlet extends HttpServlet {
         switch (action) {
             case "/add":
                 //getting POST parameters from form
-                int floorNumber = Integer.parseInt(request.getParameter("floorNumber"));
-                int capacity = Integer.parseInt(request.getParameter("capacity"));
-                Boolean balcony = Boolean.parseBoolean(request.getParameter("balcony"));
-                //form data validity check
-                if (floorNumber<0 || capacity <1) {
-                    request.setAttribute("chyba", "Je nutné vyplniť všetky hodnoty správne!");
+                if((request.getParameter("floorNumber") == "") || (request.getParameter("capacity") == "")){
+                    request.setAttribute("chyba", "Je nutné vyplniť všetky hodnoty!");
                     log.debug("form data invalid");
                     showRoomsList(request, response);
                     return;
                 }
+                if ((!request.getParameter("floorNumber").matches("^[0-9]")) ||
+                        (!request.getParameter("capacity").matches("^[0-9]"))){
+                    request.setAttribute("chyba", "Číslo poschodia a kapacita môžu obsahovať iba čísla!");
+                    log.debug("form data invalid");
+                    showRoomsList(request, response);
+                    return;
+                }
+                int floorNumber = Integer.parseInt(request.getParameter("floorNumber"));
+                int capacity = Integer.parseInt(request.getParameter("capacity"));
+                Boolean balcony = Boolean.parseBoolean(request.getParameter("balcony"));
+                //form data validity check
+                if (capacity ==0) {
+                    request.setAttribute("chyba", "Kapacita musí byť väčšia ako 0!");
+                    log.debug("form data invalid");
+                    showRoomsList(request, response);
+                    return;
+                }
+
                 //form data processing - storing to database
                 try {
                     Room room  = new Room(null, floorNumber, capacity, balcony);
