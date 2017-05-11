@@ -74,8 +74,7 @@ public class Room {
     @Override
     public String toString() {
         return "Room{" +
-                "id=" + id +
-                ", floorNumber=" + floorNumber +
+                " floorNumber=" + floorNumber +
                 ", capacity=" + capacity +
                 ", balcony=" + balcony +
                 '}';

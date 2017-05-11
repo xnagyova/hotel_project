@@ -77,8 +77,7 @@ public class Guest  {
     @Override
     public String toString() {
         return "Guest{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
+                " name='" + name + '\'' +
                 ", dateOfBirth=" + dateOfBirth +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
