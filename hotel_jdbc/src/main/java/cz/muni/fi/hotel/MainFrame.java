@@ -25,15 +25,22 @@ public class MainFrame extends JFrame {
     BookingManager bookingManager;
     RoomManager roomManager;
     GuestManager guestManager;
-    Locale locale = Locale.getDefault();
+    Locale locale;
     ResourceBundle resourceBundle;
 
     public MainFrame(BookingManager bookingManager, RoomManager roomManager, GuestManager guestManager){
-        resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
+
 
         langBox.addItem("en");
         langBox.addItem("fr");
         langBox.addItem("sk");
+        if (langBox.getSelectedItem() == null){
+            locale = Locale.getDefault();
+
+        }else{
+            locale = new Locale(langBox.getSelectedItem().toString(),langBox.getSelectedItem().toString().toUpperCase());
+        }
+        resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
 
         this.bookingManager = bookingManager;
         this.roomManager = roomManager;
@@ -64,7 +71,7 @@ public class MainFrame extends JFrame {
                 for(Frame frame1 : frames){
                     frame1.setVisible(false);
                 }
-                RoomFrame roomFrame = new RoomFrame(roomManager);
+                RoomFrame roomFrame = new RoomFrame(bookingManager,roomManager,guestManager);
                 roomFrame.pack();
                 roomFrame.setVisible(true);
             }
@@ -77,18 +84,9 @@ public class MainFrame extends JFrame {
                 for(Frame frame1 : frames){
                     frame1.setVisible(false);
                 }
-                GuestFrame guestFrame = new GuestFrame(guestManager);
+                GuestFrame guestFrame = new GuestFrame(bookingManager,roomManager,guestManager);
                 guestFrame.pack();
                 guestFrame.setVisible(true);
-            }
-        });
-        langBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                locale = new Locale(langBox.getSelectedItem().toString(),langBox.getSelectedItem().toString().toUpperCase());
-                resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
-                System.out.println(langBox.getSelectedItem().toString());
-
             }
         });
     }

@@ -1,6 +1,9 @@
 package cz.muni.fi.hotel;
 
+import cz.muni.fi.hotel.common.ValidationException;
 import javafx.scene.control.TableColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -14,6 +17,7 @@ import java.awt.event.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author katanik nagyova
@@ -33,18 +37,63 @@ public class RoomFrame extends javax.swing.JFrame {
     private JLabel labelCapacity;
     private JLabel labelBalcony;
     private JLabel labelLang;
+    private EditSwingWorker editSwingWorker;
+    private AddSwingWorker addSwingWorker;
+    private DeleteSwingWorker deleteSwingWorker;
+    static JFrame frame;
     public ResourceBundle resourceBundle;
     public Locale locale;
     RoomManager roomManager;
+    private static final Logger log = LoggerFactory.getLogger(RoomFrame.class.getName());
     BookingManager bookingManager;
     GuestManager guestManager;
 
+    private class AddSwingWorker extends SwingWorker<Void,Void>{
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            Room room = new Room();
+            room.setBalcony(hasBalconyRadioButton.isSelected());
+            room.setCapacity(Integer.parseInt(textField2.getText()));
+            room.setFloorNumber(Integer.parseInt(textField1.getText()));
+            roomManager.buildRoom(room);
+            log.info("Adding room");
+            return null;
+        }
+    }
+
+    private class EditSwingWorker extends SwingWorker<Void,Void>{
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            Room room = new Room();
+            room.setBalcony(hasBalconyRadioButton.isSelected());
+            room.setCapacity(Integer.parseInt(textField2.getText()));
+            room.setFloorNumber(Integer.parseInt(textField1.getText()));
+            room.setId(Long.parseLong((jTableRooms.getModel().getValueAt(jTableRooms.getSelectedRow(),3)).toString()));
+            roomManager.updateRoomInformation(room);
+            log.info("Editing room");
+            return null;
+        }
+    }
+
+    private class DeleteSwingWorker extends SwingWorker<Void,Void>{
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            for(int i = 0; i < jTableRooms.getSelectedRows().length; i++) {
+                int row = jTableRooms.getSelectedRows()[i];
+                Long id = Long.parseLong((jTableRooms.getModel().getValueAt(row, 3)).toString());
+                roomManager.deleteRoom(roomManager.findRoomById(id));
+                log.info("deleting room");
+            }
+            return null;
+        }
+    }
 
 
-
-    public RoomFrame(RoomManager roomManager) {
-        //locale = Locale.getDefault();
-        locale = new Locale("sk","SK");
+    public RoomFrame(BookingManager bookingManager,RoomManager roomManager, GuestManager guestManager) {
+        locale = Locale.getDefault();
         resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
 
         langBox.addItem("en");
@@ -55,7 +104,6 @@ public class RoomFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTableRooms.setModel(new RoomFrame.RoomsTableModel());
-        //scrollPane.setViewportView(jTableGuests);
         add(panel2);
 
         addRoomButton.setText(resourceBundle.getString("main.add"));
@@ -85,10 +133,27 @@ public class RoomFrame extends javax.swing.JFrame {
         addRoomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(textField1.getText().equals("") || textField2.getText().equals("")){
+                    JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
+                    log.debug("form data invalid");
+                } else if(!textField1.getText().matches("^[0-9]") || !textField2.getText().matches("^[0-9]")){
+                    JOptionPane.showMessageDialog(frame,"Capacity and floor number must be numbers!");
+                    log.debug("form data invalid");
+                }
                 int floorNumber = Integer.parseInt(textField1.getText());
                 int capacity = Integer.parseInt(textField2.getText());
-                Boolean balcony = hasBalconyRadioButton.isSelected();
-                roomManager.buildRoom(new Room(null,floorNumber,capacity,balcony));
+                if (capacity<=0){
+                    JOptionPane.showMessageDialog(frame,"Capacity can not be negative or zero!");
+                    log.debug("form data invalid");
+                }
+                if (floorNumber<0){
+                    JOptionPane.showMessageDialog(frame,"Floor number can not be negative");
+                    log.debug("form data invalid");
+                }
+                addSwingWorker = new AddSwingWorker();
+                addSwingWorker.execute();
+                JOptionPane.showMessageDialog(frame,"Succesfully added!");
+                log.info("OKEY");
                 clearFields();
                 jTableRooms.setModel(new RoomFrame.RoomsTableModel());
             }
@@ -96,6 +161,7 @@ public class RoomFrame extends javax.swing.JFrame {
 
         jTableRooms.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
+                log.info("Filling text fields");
                 int row = jTableRooms.getSelectedRow();
                 String floorNumber = jTableRooms.getModel().getValueAt(row,0).toString();
                 String capacity = jTableRooms.getModel().getValueAt(row,1).toString();
@@ -103,6 +169,7 @@ public class RoomFrame extends javax.swing.JFrame {
                 textField1.setText(floorNumber);
                 textField2.setText(capacity);
                 hasBalconyRadioButton.setSelected(balcony);
+
             }
 
         });
@@ -113,13 +180,28 @@ public class RoomFrame extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (jTableRooms.getSelectedRow() != -1) {
 
+                    if(textField1.getText().equals("") || textField2.getText().equals("")){
+                        JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
+                        log.debug("form data invalid");
+                    } else if(!textField1.getText().matches("^[0-9]") || !textField2.getText().matches("^[0-9]")){
+                        JOptionPane.showMessageDialog(frame,"Capacity and floor number must be numbers!");
+                        log.debug("form data invalid");
+                    }
                     int floorNumber  = Integer.parseInt(textField1.getText());
                     int capacity  = Integer.parseInt(textField2.getText());
                     boolean balcony = hasBalconyRadioButton.isSelected();
-                    int row = jTableRooms.getSelectedRow();
-                    Long id = Long.parseLong((jTableRooms.getModel().getValueAt(row,3)).toString());
-                    Room room = new Room(id,floorNumber,capacity,balcony);
-                    roomManager.updateRoomInformation(room);
+                    if (capacity<=0){
+                        JOptionPane.showMessageDialog(frame,"Capacity can not be negative or zero!");
+                        log.debug("form data invalid");
+                    }
+                    if (floorNumber<0){
+                        JOptionPane.showMessageDialog(frame,"Floor number can not be negative");
+                        log.debug("form data invalid");
+                    }
+                    editSwingWorker = new EditSwingWorker();
+                    editSwingWorker.execute();
+                    JOptionPane.showMessageDialog(frame,"Succesfully edited!");
+                    log.info("edit done");
                     clearFields();
 
                     jTableRooms.setModel(new RoomFrame.RoomsTableModel());
@@ -135,35 +217,30 @@ public class RoomFrame extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (jTableRooms.getSelectedRows().length != 0) {
-                    for(int i = 0; i < jTableRooms.getSelectedRows().length; i++) {
-                        int row = jTableRooms.getSelectedRows()[i];
-                        Long id = Long.parseLong((jTableRooms.getModel().getValueAt(row, 3)).toString());
-                        roomManager.deleteRoom(roomManager.findRoomById(id));
-                    }
+                    deleteSwingWorker = new DeleteSwingWorker();
+                    deleteSwingWorker.execute();
+                    JOptionPane.showMessageDialog(frame,"Succesfully deleted!");
+                    log.info("delete done");
                     jTableRooms.setModel(new RoomFrame.RoomsTableModel());
                 }
-            }
-        });
-        langBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                locale = new Locale(langBox.getSelectedItem().toString(),langBox.getSelectedItem().toString().toUpperCase());
-                resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
             }
         });
     }
 
 
     public void clearFields(){
+        log.info("clearing fields");
         textField1.setText("");
         textField2.setText("");
     }
+
 
 
     public class RoomsTableModel extends AbstractTableModel {
 
 
         private List<Room> rooms = roomManager.listAllRooms();
+
 
         @Override
         public int getRowCount() {
@@ -230,7 +307,7 @@ public class RoomFrame extends javax.swing.JFrame {
         GuestManager guestManager = ctx.getBean(GuestManager.class);
         RoomManager roomManager = ctx.getBean(RoomManager.class);
         EventQueue.invokeLater( ()-> { // zde použito funcionální rozhraní
-                    JFrame frame = new RoomFrame(roomManager);
+                    frame = new RoomFrame(bookingManager,roomManager,guestManager);
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     frame.pack();
                     frame.setVisible(true);

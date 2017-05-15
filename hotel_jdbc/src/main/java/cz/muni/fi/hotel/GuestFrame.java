@@ -1,6 +1,8 @@
 package cz.muni.fi.hotel;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -11,7 +13,6 @@ import java.awt.event.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 import java.util.ResourceBundle;
 
 /**
@@ -36,27 +37,81 @@ public class GuestFrame extends JFrame{
     private JComboBox langBox;
     private JLabel labelLang;
     static JFrame frame;
+    private EditSwingWorker editSwingWorker;
+    private AddSwingWorker addSwingWorker;
+    private DeleteSwingWorker deleteSwingWorker;
+    private final static Logger log = LoggerFactory.getLogger(RoomFrame.class);
     GuestManager guestManager;
     BookingManager bookingManager;
     RoomManager roomManager;
     Locale locale;
     ResourceBundle resourceBundle;
 
+    private class AddSwingWorker extends SwingWorker<Void,Void>{
 
-    public GuestFrame(GuestManager guestManager) {
+        @Override
+        protected Void doInBackground() throws Exception {
+            Guest guest = new Guest();
+            guest.setPhoneNumber(textField3.getText());
+            guest.setName(textField1.getText());
+            int day = (int)comboBox1.getSelectedItem();
+            int month = (int)comboBox2.getSelectedItem();
+            int year = (int)comboBox3.getSelectedItem();
+            guest.setDateOfBirth(LocalDate.of(year,month,day));
+            guestManager.createGuest(guest);
+            log.info("Adding guest");
+            return null;
+        }
+    }
+
+    private class EditSwingWorker extends SwingWorker<Void,Void>{
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            Guest guest = new Guest();
+            guest.setPhoneNumber(textField3.getText());
+            guest.setName(textField1.getText());
+            int day = (int)comboBox1.getSelectedItem();
+            int month = (int)comboBox2.getSelectedItem();
+            int year = (int)comboBox3.getSelectedItem();
+            guest.setDateOfBirth(LocalDate.of(year,month,day));
+            guest.setId(Long.parseLong((jTableGuests.getModel().getValueAt(jTableGuests.getSelectedRow(),3)).toString()));
+            guestManager.updateGuestInformation(guest);
+            log.info("Editing guest");
+            return null;
+        }
+    }
+
+    private class DeleteSwingWorker extends SwingWorker<Void,Void>{
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            for(int i = 0; i < jTableGuests.getSelectedRows().length; i++) {
+                int row = jTableGuests.getSelectedRows()[i];
+                Long id = Long.parseLong((jTableGuests.getModel().getValueAt(row, 3)).toString());
+                guestManager.deleteGuest(guestManager.findGuestById(id));
+                log.info("Deleting guest");
+            }
+            return null;
+        }
+    }
+
+
+
+    public GuestFrame(BookingManager bookingManager,RoomManager roomManager,GuestManager guestManager) {
 
 
         langBox.addItem("en");
         langBox.addItem("fr");
         langBox.addItem("sk");
 
-        locale = new Locale(langBox.getSelectedItem().toString(),langBox.getSelectedItem().toString().toUpperCase());
+        locale = Locale.getDefault();
+
         resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
         this.guestManager = guestManager;
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTableGuests.setModel(new GuestFrame.GuestsTableModel());
-        //scrollPane.setViewportView(jTableGuests);
         add(panel1);
         for(int i=1;i<=31;i++)
         {
@@ -93,12 +148,14 @@ public class GuestFrame extends JFrame{
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String name = textField1.getText();
-                int day = (int)comboBox1.getSelectedItem();
-                int month = (int)comboBox2.getSelectedItem();
-                int year = (int)comboBox3.getSelectedItem();
-                String phoneNumber = textField3.getText();
-                guestManager.createGuest(new Guest(null,name,LocalDate.of(year,month,day),phoneNumber));
+                if(textField1.getText().equals("") || textField3.getText().equals("")){
+                    JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
+                    log.debug("form data invalid");
+                }
+                addSwingWorker = new AddSwingWorker();
+                addSwingWorker.execute();
+                JOptionPane.showMessageDialog(frame,"Succesfully added!");
+                log.info("OKEY");
                 clearFields();
 
                 jTableGuests.setModel(new GuestFrame.GuestsTableModel());
@@ -121,23 +178,21 @@ public class GuestFrame extends JFrame{
                 comboBox3.setSelectedItem(year);
             }
 
-            });
+        });
 
 
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (jTableGuests.getSelectedRow() != -1) {
-
-                    String name = textField1.getText();
-                    int row = jTableGuests.getSelectedRow();
-                    Long id = Long.parseLong((jTableGuests.getModel().getValueAt(row,3)).toString());
-                    int day = (int) comboBox1.getSelectedItem();
-                    int month = (int) comboBox2.getSelectedItem();
-                    int year = (int) comboBox3.getSelectedItem();
-                    String phoneNumber = textField3.getText();
-                    Guest guest = new Guest(id,name,LocalDate.of(year,month,day),phoneNumber);
-                    guestManager.updateGuestInformation(guest);
+                if (jTableGuests.getSelectedRow() != 0) {
+                    if(textField1.getText().equals("") || textField3.getText().equals("")){
+                        JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
+                        log.debug("form data invalid");
+                    }
+                    editSwingWorker = new EditSwingWorker();
+                    editSwingWorker.execute();
+                    JOptionPane.showMessageDialog(frame,"Succesfully edited!");
+                    log.info("OKEY");
                     clearFields();
 
                     jTableGuests.setModel(new GuestFrame.GuestsTableModel());
@@ -145,32 +200,21 @@ public class GuestFrame extends JFrame{
             }
         });
 
-    jTableGuests.addComponentListener(new ComponentAdapter() {
+        jTableGuests.addComponentListener(new ComponentAdapter() {
 
-    });
+        });
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (jTableGuests.getSelectedRows().length != 0) {
-                    for(int i = 0; i < jTableGuests.getSelectedRows().length; i++) {
-                        int row = jTableGuests.getSelectedRows()[i];
-                        Long id = Long.parseLong((jTableGuests.getModel().getValueAt(row, 3)).toString());
-                        guestManager.deleteGuest(guestManager.findGuestById(id));
-                    }
+                    deleteSwingWorker = new DeleteSwingWorker();
+                    deleteSwingWorker.execute();
+                    JOptionPane.showMessageDialog(frame,"Succesfully deleted!");
+                    log.info("OKEY");
                     jTableGuests.setModel(new GuestFrame.GuestsTableModel());
 
 
                 }
-            }
-        });
-        langBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                locale = new Locale(langBox.getSelectedItem().toString(),langBox.getSelectedItem().toString().toUpperCase());
-                resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
-                frame = new GuestFrame(guestManager);
-                frame.pack();
-                frame.setVisible(true);
             }
         });
     }
@@ -185,9 +229,12 @@ public class GuestFrame extends JFrame{
 
 
     public class GuestsTableModel extends AbstractTableModel {
+        List<Guest> guests = guestManager.findAllGuests();
 
 
-        private List<Guest> guests = guestManager.findAllGuests();
+
+
+
 
         @Override
         public int getRowCount() {
@@ -255,13 +302,15 @@ public class GuestFrame extends JFrame{
 
 
         EventQueue.invokeLater( ()-> { // zde použito funcionální rozhraní
-            frame = new GuestFrame(guestManager);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.pack();
-            frame.setVisible(true);
-            }
+                    frame = new GuestFrame(bookingManager,roomManager,guestManager);
+                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    frame.pack();
+                    frame.setVisible(true);
+                }
         );
-        }
     }
+}
+
+
 
 

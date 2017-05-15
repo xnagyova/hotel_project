@@ -89,6 +89,7 @@ public class BookingManagerImpl implements BookingManager {
 
     @Override
     public void createBooking(Booking booking) {
+        validate(booking);
         SimpleJdbcInsert insertBooking = new SimpleJdbcInsert(jdbc).withTableName("bookings").usingGeneratedKeyColumns("id");
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("price",booking.getPrice())
@@ -98,7 +99,7 @@ public class BookingManagerImpl implements BookingManager {
                 .addValue("departureDate", toSQLDate(booking.getDepartureDate()));
         Number id = insertBooking.executeAndReturnKey(parameters);
         booking.setId(id.longValue());
-        validate(booking);
+
     }
 
     @Override
