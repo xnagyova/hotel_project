@@ -32,17 +32,15 @@ public class RoomFrame extends javax.swing.JFrame {
     private JTextField textField2;
     private JRadioButton hasBalconyRadioButton;
     private JButton backButton;
-    private JComboBox langBox;
     private JLabel labelFloorNumber;
     private JLabel labelCapacity;
     private JLabel labelBalcony;
-    private JLabel labelLang;
     private EditSwingWorker editSwingWorker;
     private AddSwingWorker addSwingWorker;
     private DeleteSwingWorker deleteSwingWorker;
-    static JFrame frame;
-    public ResourceBundle resourceBundle;
-    public Locale locale;
+    private static JFrame frame;
+    private ResourceBundle resourceBundle;
+    private Locale locale;
     RoomManager roomManager;
     private static final Logger log = LoggerFactory.getLogger(RoomFrame.class.getName());
     BookingManager bookingManager;
@@ -93,12 +91,10 @@ public class RoomFrame extends javax.swing.JFrame {
 
 
     public RoomFrame(BookingManager bookingManager,RoomManager roomManager, GuestManager guestManager) {
-        locale = Locale.getDefault();
+        //locale = Locale.getDefault();
+        //locale = new Locale("sk","SK");
+        locale = new Locale("fr","FR");
         resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
-
-        langBox.addItem("en");
-        langBox.addItem("fr");
-        langBox.addItem("sk");
 
         this.roomManager = roomManager;
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -112,7 +108,6 @@ public class RoomFrame extends javax.swing.JFrame {
         labelBalcony.setText("");
         labelCapacity.setText(resourceBundle.getString("main.capacity"));
         labelFloorNumber.setText(resourceBundle.getString("main.floorNumber"));
-        labelLang.setText(resourceBundle.getString("main.language"));
         backButton.setText(resourceBundle.getString("main.back"));
         hasBalconyRadioButton.setText(resourceBundle.getString("main.balcony"));
 
@@ -134,28 +129,25 @@ public class RoomFrame extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(textField1.getText().equals("") || textField2.getText().equals("")){
-                    JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorFields"));
                     log.debug("form data invalid");
-                } else if(!textField1.getText().matches("^[0-9]") || !textField2.getText().matches("^[0-9]")){
-                    JOptionPane.showMessageDialog(frame,"Capacity and floor number must be numbers!");
+                } else if(!textField1.getText().matches("[0-9]+") || !textField2.getText().matches("[0-9]+")){
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorCapNumber"));
                     log.debug("form data invalid");
+                }else if (Integer.parseInt(textField2.getText())<=0){
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorCapNegative"));
+                    log.debug("form data invalid");
+                }else if (Integer.parseInt(textField1.getText())<0){
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorFNNegative"));
+                    log.debug("form data invalid");
+                }else {
+                    addSwingWorker = new AddSwingWorker();
+                    addSwingWorker.execute();
+                    JOptionPane.showMessageDialog(frame, resourceBundle.getString("added"));
+                    log.info("OKEY");
+                    clearFields();
+                    jTableRooms.setModel(new RoomFrame.RoomsTableModel());
                 }
-                int floorNumber = Integer.parseInt(textField1.getText());
-                int capacity = Integer.parseInt(textField2.getText());
-                if (capacity<=0){
-                    JOptionPane.showMessageDialog(frame,"Capacity can not be negative or zero!");
-                    log.debug("form data invalid");
-                }
-                if (floorNumber<0){
-                    JOptionPane.showMessageDialog(frame,"Floor number can not be negative");
-                    log.debug("form data invalid");
-                }
-                addSwingWorker = new AddSwingWorker();
-                addSwingWorker.execute();
-                JOptionPane.showMessageDialog(frame,"Succesfully added!");
-                log.info("OKEY");
-                clearFields();
-                jTableRooms.setModel(new RoomFrame.RoomsTableModel());
             }
         });
 
@@ -181,30 +173,26 @@ public class RoomFrame extends javax.swing.JFrame {
                 if (jTableRooms.getSelectedRow() != -1) {
 
                     if(textField1.getText().equals("") || textField2.getText().equals("")){
-                        JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
+                        JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorFields"));
                         log.debug("form data invalid");
-                    } else if(!textField1.getText().matches("^[0-9]") || !textField2.getText().matches("^[0-9]")){
-                        JOptionPane.showMessageDialog(frame,"Capacity and floor number must be numbers!");
+                    } else if(!textField1.getText().matches("[0-9]+") || !textField2.getText().matches("[0-9]+")){
+                        JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorCapNumber"));
                         log.debug("form data invalid");
-                    }
-                    int floorNumber  = Integer.parseInt(textField1.getText());
-                    int capacity  = Integer.parseInt(textField2.getText());
-                    boolean balcony = hasBalconyRadioButton.isSelected();
-                    if (capacity<=0){
-                        JOptionPane.showMessageDialog(frame,"Capacity can not be negative or zero!");
+                    }else if (Integer.parseInt(textField2.getText())<=0){
+                        JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorCapNegative"));
                         log.debug("form data invalid");
-                    }
-                    if (floorNumber<0){
-                        JOptionPane.showMessageDialog(frame,"Floor number can not be negative");
+                    }else if (Integer.parseInt(textField1.getText())<0){
+                        JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorFNNegative"));
                         log.debug("form data invalid");
-                    }
-                    editSwingWorker = new EditSwingWorker();
-                    editSwingWorker.execute();
-                    JOptionPane.showMessageDialog(frame,"Succesfully edited!");
-                    log.info("edit done");
-                    clearFields();
+                    }else {
+                        editSwingWorker = new EditSwingWorker();
+                        editSwingWorker.execute();
+                        JOptionPane.showMessageDialog(frame, resourceBundle.getString("edited"));
+                        log.info("edit done");
+                        clearFields();
 
-                    jTableRooms.setModel(new RoomFrame.RoomsTableModel());
+                        jTableRooms.setModel(new RoomFrame.RoomsTableModel());
+                    }
 
                 }
             }
@@ -219,7 +207,7 @@ public class RoomFrame extends javax.swing.JFrame {
                 if (jTableRooms.getSelectedRows().length != 0) {
                     deleteSwingWorker = new DeleteSwingWorker();
                     deleteSwingWorker.execute();
-                    JOptionPane.showMessageDialog(frame,"Succesfully deleted!");
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("deleted"));
                     log.info("delete done");
                     jTableRooms.setModel(new RoomFrame.RoomsTableModel());
                 }

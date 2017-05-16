@@ -20,8 +20,6 @@ public class MainFrame extends JFrame {
     public JButton button2;
     public JButton button3;
     private JLabel labelHotel;
-    private JComboBox langBox;
-    private JLabel labelLang;
     BookingManager bookingManager;
     RoomManager roomManager;
     GuestManager guestManager;
@@ -30,16 +28,9 @@ public class MainFrame extends JFrame {
 
     public MainFrame(BookingManager bookingManager, RoomManager roomManager, GuestManager guestManager){
 
-
-        langBox.addItem("en");
-        langBox.addItem("fr");
-        langBox.addItem("sk");
-        if (langBox.getSelectedItem() == null){
-            locale = Locale.getDefault();
-
-        }else{
-            locale = new Locale(langBox.getSelectedItem().toString(),langBox.getSelectedItem().toString().toUpperCase());
-        }
+        //locale = Locale.getDefault();
+        //locale = new Locale("sk","SK");
+        locale = new Locale("fr","FR");
         resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
 
         this.bookingManager = bookingManager;
@@ -49,7 +40,6 @@ public class MainFrame extends JFrame {
         button2.setText(resourceBundle.getString("main.rm"));
         button3.setText(resourceBundle.getString("main.gm"));
         labelHotel.setText(resourceBundle.getString("main.title"));
-        labelLang.setText(resourceBundle.getString("main.language"));
         add(panel1);
         button1.addActionListener(new ActionListener() {
             @Override

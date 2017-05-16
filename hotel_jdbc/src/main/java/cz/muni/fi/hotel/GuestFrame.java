@@ -34,8 +34,6 @@ public class GuestFrame extends JFrame{
     private JComboBox comboBox2;
     private JComboBox comboBox3;
     private JButton backButton;
-    private JComboBox langBox;
-    private JLabel labelLang;
     static JFrame frame;
     private EditSwingWorker editSwingWorker;
     private AddSwingWorker addSwingWorker;
@@ -100,12 +98,9 @@ public class GuestFrame extends JFrame{
 
     public GuestFrame(BookingManager bookingManager,RoomManager roomManager,GuestManager guestManager) {
 
-
-        langBox.addItem("en");
-        langBox.addItem("fr");
-        langBox.addItem("sk");
-
-        locale = Locale.getDefault();
+        //locale = Locale.getDefault();
+        //locale = new Locale("sk","SK");
+        locale = new Locale("fr","FR");
 
         resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
         this.guestManager = guestManager;
@@ -127,7 +122,6 @@ public class GuestFrame extends JFrame{
         editButton.setText(resourceBundle.getString("main.edit"));
         deleteButton.setText(resourceBundle.getString("main.delete"));
         backButton.setText(resourceBundle.getString("main.back"));
-        labelLang.setText(resourceBundle.getString("main.language"));
         dateOfBirthLabel.setText(resourceBundle.getString("main.birth"));
         nameLabel.setText(resourceBundle.getString("main.name"));
         phoneNumberLabel.setText(resourceBundle.getString("main.telnumber"));
@@ -149,16 +143,17 @@ public class GuestFrame extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(textField1.getText().equals("") || textField3.getText().equals("")){
-                    JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorFields"));
                     log.debug("form data invalid");
-                }
-                addSwingWorker = new AddSwingWorker();
-                addSwingWorker.execute();
-                JOptionPane.showMessageDialog(frame,"Succesfully added!");
-                log.info("OKEY");
-                clearFields();
+                }else {
+                    addSwingWorker = new AddSwingWorker();
+                    addSwingWorker.execute();
+                    JOptionPane.showMessageDialog(frame, resourceBundle.getString("added"));
+                    log.info("OKEY");
+                    clearFields();
 
-                jTableGuests.setModel(new GuestFrame.GuestsTableModel());
+                    jTableGuests.setModel(new GuestFrame.GuestsTableModel());
+                }
             }
         });
 
@@ -186,16 +181,17 @@ public class GuestFrame extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 if (jTableGuests.getSelectedRow() != 0) {
                     if(textField1.getText().equals("") || textField3.getText().equals("")){
-                        JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
+                        JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorFields"));
                         log.debug("form data invalid");
-                    }
-                    editSwingWorker = new EditSwingWorker();
-                    editSwingWorker.execute();
-                    JOptionPane.showMessageDialog(frame,"Succesfully edited!");
-                    log.info("OKEY");
-                    clearFields();
+                    }else {
+                        editSwingWorker = new EditSwingWorker();
+                        editSwingWorker.execute();
+                        JOptionPane.showMessageDialog(frame, resourceBundle.getString("edited"));
+                        log.info("OKEY");
+                        clearFields();
 
-                    jTableGuests.setModel(new GuestFrame.GuestsTableModel());
+                        jTableGuests.setModel(new GuestFrame.GuestsTableModel());
+                    }
                 }
             }
         });
@@ -209,7 +205,7 @@ public class GuestFrame extends JFrame{
                 if (jTableGuests.getSelectedRows().length != 0) {
                     deleteSwingWorker = new DeleteSwingWorker();
                     deleteSwingWorker.execute();
-                    JOptionPane.showMessageDialog(frame,"Succesfully deleted!");
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("deleted"));
                     log.info("OKEY");
                     jTableGuests.setModel(new GuestFrame.GuestsTableModel());
 

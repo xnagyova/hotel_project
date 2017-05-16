@@ -38,8 +38,6 @@ public class BookingFrame extends JFrame {
     private JLabel labelGuest;
     private JLabel labelArrival;
     private JLabel labelDeparture;
-    private JComboBox langBox;
-    private JLabel labelLang;
     static MainFrame frame;
     private final static Logger log = LoggerFactory.getLogger(RoomFrame.class);
     private EditSwingWorker editSwingWorker;
@@ -117,12 +115,11 @@ public class BookingFrame extends JFrame {
 
 
     public BookingFrame(BookingManager bookingManager, RoomManager roomManager, GuestManager guestManager) {
-        locale = Locale.getDefault();
+        //locale = Locale.getDefault();
+        //locale = new Locale("sk","SK");
+        locale = new Locale("fr","FR");
         resourceBundle = ResourceBundle.getBundle("HotelBundle",locale);
 
-        langBox.addItem("en");
-        langBox.addItem("fr");
-        langBox.addItem("sk");
 
         this.bookingManager = bookingManager;
         this.roomManager = roomManager;
@@ -131,7 +128,7 @@ public class BookingFrame extends JFrame {
         jTableBookings.setModel(new BookingFrame.BookingsTableModel());
         add(panel1);
 
-        List<Room> rooms = roomManager.listAllRooms();
+        List<Room> rooms = bookingManager.findFreeRooms();
         List<Guest> guests = guestManager.findAllGuests();
         for (Room room: rooms) {
             comboBox1.addItem(room);
@@ -157,7 +154,6 @@ public class BookingFrame extends JFrame {
         editButton.setText(resourceBundle.getString("main.edit"));
         deleteButton.setText(resourceBundle.getString("main.delete"));
         backButton.setText(resourceBundle.getString("main.back"));
-        labelLang.setText(resourceBundle.getString("main.language"));
         labelArrival.setText(resourceBundle.getString("main.adate"));
         labelDeparture.setText(resourceBundle.getString("main.ddate"));
         labelGuest.setText(resourceBundle.getString("main.guest"));
@@ -167,31 +163,28 @@ public class BookingFrame extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(textField1.getText().equals("")){
-                    JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
-                    log.debug("form data invalid");
-                }else if(!textField1.getText().matches("^[0-9]")){
-                    JOptionPane.showMessageDialog(frame,"Price has to be a number!");
-                    log.debug("form data invalid");
-                }
-                int price = Integer.parseInt(textField1.getText());
-                if(price <=0){
-                    JOptionPane.showMessageDialog(frame,"Price can not be zero or negative!");
-                    log.debug("form data invalid");
-                }
                 int arrivalDay = (int)comboBox3.getSelectedItem();
                 int arrivalMonth = (int)comboBox4.getSelectedItem();
                 int arrivalYear = (int)comboBox5.getSelectedItem();
                 int departureDay = (int)comboBox6.getSelectedItem();
                 int departureMonth = (int)comboBox7.getSelectedItem();
                 int departureYear = (int)comboBox8.getSelectedItem();
-                if(LocalDate.of(departureYear,departureMonth,departureDay).isBefore(LocalDate.of(arrivalYear,arrivalMonth,arrivalDay))){
-                    JOptionPane.showMessageDialog(frame,"Departure date can not be before arrival date!");
+                if(textField1.getText().equals("")){
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorFields"));
+                    log.debug("form data invalid");
+                }else if(!textField1.getText().matches("[0-9]+")){
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorPriceNumber"));
+                    log.debug("form data invalid");
+                }else if(Integer.parseInt(textField1.getText()) <=0){
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorPriceNegative"));
+                    log.debug("form data invalid");
+                }else if(LocalDate.of(departureYear,departureMonth,departureDay).isBefore(LocalDate.of(arrivalYear,arrivalMonth,arrivalDay))){
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorDepartureBeforeArrival"));
                     log.debug("form data invalid");
                 }else {
                     addSwingWorker = new AddSwingWorker();
                     addSwingWorker.execute();
-                    JOptionPane.showMessageDialog(frame, "Succesfully added!");
+                    JOptionPane.showMessageDialog(frame, resourceBundle.getString("added"));
                     log.info("OKEY");
                     clearFields();
 
@@ -231,36 +224,34 @@ public class BookingFrame extends JFrame {
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (jTableBookings.getSelectedRow() == 1) {
-                    if(textField1.getText().equals("")){
-                        JOptionPane.showMessageDialog(frame,"You have to fill all fields!");
-                        log.debug("form data invalid");
-                    }else if(!textField1.getText().matches("^[0-9]")){
-                        JOptionPane.showMessageDialog(frame,"Price has to be a number!");
-                        log.debug("form data invalid");
-                    }
-                    int price = Integer.parseInt(textField1.getText());
-                    if(price <=0){
-                        JOptionPane.showMessageDialog(frame,"Price can not be zero or negative!");
-                        log.debug("form data invalid");
-                    }
+                if (jTableBookings.getSelectedRow() != 0) {
                     int arrivalDay = (int) comboBox3.getSelectedItem();
                     int arrivalMonth = (int) comboBox4.getSelectedItem();
                     int arrivalYear = (int) comboBox5.getSelectedItem();
                     int departureDay = (int) comboBox6.getSelectedItem();
                     int departureMonth = (int) comboBox7.getSelectedItem();
                     int departureYear = (int) comboBox8.getSelectedItem();
-                    if(LocalDate.of(departureYear,departureMonth,departureDay).isBefore(LocalDate.of(arrivalYear,arrivalMonth,arrivalDay))){
-                        JOptionPane.showMessageDialog(frame,"Departure date can not be before arrival date!");
+                    if(textField1.getText().equals("")){
+                        JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorFields"));
                         log.debug("form data invalid");
-                    }
-                    editSwingWorker = new EditSwingWorker();
-                    editSwingWorker.execute();
-                    JOptionPane.showMessageDialog(frame,"Succesfully edited!");
-                    log.info("OKEY");
-                    clearFields();
+                    }else if(!textField1.getText().matches("[0-9]+")){
+                        JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorPriceNumber"));
+                        log.debug("form data invalid");
+                    }else if(Integer.parseInt(textField1.getText()) <=0){
+                        JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorPriceNegative"));
+                        log.debug("form data invalid");
+                    }else if(LocalDate.of(departureYear,departureMonth,departureDay).isBefore(LocalDate.of(arrivalYear,arrivalMonth,arrivalDay))){
+                        JOptionPane.showMessageDialog(frame,resourceBundle.getString("errorDepartureBeforeArrival"));
+                        log.debug("form data invalid");
+                    }else {
+                        editSwingWorker = new EditSwingWorker();
+                        editSwingWorker.execute();
+                        JOptionPane.showMessageDialog(frame, resourceBundle.getString("edited"));
+                        log.info("OKEY");
+                        clearFields();
 
-                    jTableBookings.setModel(new BookingFrame.BookingsTableModel());
+                        jTableBookings.setModel(new BookingFrame.BookingsTableModel());
+                    }
                 }
             }
         });
@@ -274,7 +265,7 @@ public class BookingFrame extends JFrame {
                 if (jTableBookings.getSelectedRows().length != 0) {
                     deleteSwingWorker = new DeleteSwingWorker();
                     deleteSwingWorker.execute();
-                    JOptionPane.showMessageDialog(frame,"Succesfully deleted!");
+                    JOptionPane.showMessageDialog(frame,resourceBundle.getString("deleted"));
                     log.info("OKEY");
                     jTableBookings.setModel(new BookingFrame.BookingsTableModel());
 
